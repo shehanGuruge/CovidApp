@@ -21,12 +21,12 @@ export default class WelcomeScreen extends Component {
         <Text style = {[styles.welcomeTextStyles,{fontSize: 16}]}>with us by simply scanning the QR Code</Text>
         <Text style = {[styles.welcomeTextStyles,{fontSize: 16}]}>at the shop</Text>
 
-        <TouchableOpacity onPress = {() => this.props.navigation.navigate('tabScreens')}>
+        <TouchableOpacity onPress = {() => this.props.navigation.navigate('MobileVerification')}>
             <View style = {styles.btnViewStyle}>
                 <Text style = {styles.btnTextStyle}>Login</Text>
             </View>
         </TouchableOpacity>
-        <TouchableOpacity>
+        <TouchableOpacity onPress = {() => this.props.navigation.navigate('Registration')}>
             <Text style = {styles.btnRegisterStyle}>Register</Text>
         </TouchableOpacity>
       </View>

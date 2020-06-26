@@ -12,12 +12,12 @@ export default class ShopItem extends Component {
 
   render() {
 
-    const {onPress} = this.props;
+    const {onPress, shopName, shopAddress} = this.props;
     return (
       <View style = {styles.listItemView}>
         <View style = {{flexDirection: 'column'}}>
-            <Text style = {styles.shopName}>SUNWAY PYRAMID</Text>
-            <Text style = {styles.shopAddress} numberOfLines = {1} ellipsizeMode = "tail">JALAN COCHRAHNE, TAMAN MALURI SAMRUI</Text>
+    <Text style = {styles.shopName}>SUNWAT BANRADER</Text>
+            <Text style = {styles.shopAddress} numberOfLines = {1} ellipsizeMode = "tail">{this.props.shopAddress}</Text>
         </View>
         <TouchableOpacity onPress = {this.props.onPress}>
             <Image source = {require('../../../assets/tabbedScreenImages/myShopScreen/next.png')}

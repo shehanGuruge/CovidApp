@@ -9,20 +9,20 @@ export default class HomeScreen extends Component {
     this.state = {
         tabClicked : [
             {
-                'back' : '#009999',
+                'back' : '#2b84a4',
                 'text': '#ffffff',
             },
             {
                 'back' : '#ffffff',
-                'text': '#009999',
+                'text': '#2b84a4',
             },
             {
                 'back' : '#ffffff',
-                'text': '#009999',
+                'text': '#2b84a4',
             },
             {
                 'back' : '#ffffff',
-                'text': '#009999',
+                'text': '#2b84a4',
             },
         ],
         prevClickedID: 0,
@@ -80,9 +80,9 @@ export default class HomeScreen extends Component {
   handleOnTabPressed = (id) => {
         if(this.state.prevClickedID !== id){
             var recentLog = this.state.tabClicked;
-            recentLog[id].back = "#009999";
+            recentLog[id].back = "#2b84a4";
             recentLog[id].text = "#ffffff";
-            recentLog[this.state.prevClickedID].text = "#009999";
+            recentLog[this.state.prevClickedID].text = "#2b84a4";
             recentLog[this.state.prevClickedID].back = "#ffffff";
     
             this.setState({

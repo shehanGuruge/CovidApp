@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 15, 
         letterSpacing: 0.5,
         borderWidth: 1, 
-        borderColor: '#009999'
+        borderColor: '#2b84a4'
     }
 });
 

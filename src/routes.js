@@ -76,7 +76,7 @@ const MainStackNavigator = createStackNavigator({
         },
         {
             tabBarOptions: {
-                activeTintColor: '#009999',
+                activeTintColor: '#2b84a4',
             }
         }
         ),
@@ -89,7 +89,7 @@ const MainStackNavigator = createStackNavigator({
                 fontWeight: '100'
             },
             headerStyle: {
-                backgroundColor: '#009999'
+                backgroundColor: '#2b84a4'
             },
             headerRight : () => 
                 <TouchableOpacity>

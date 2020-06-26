@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
         alignSelf:'center'
     },
     btnViewStyle: {
-        backgroundColor: '#009999', 
+        backgroundColor: '#2b84a4', 
         borderRadius: 8, 
         paddingVertical: 15, 
         paddingHorizontal: 20, 

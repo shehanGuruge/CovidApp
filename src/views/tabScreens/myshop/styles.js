@@ -2,7 +2,7 @@ import {StyleSheet} from 'react-native';
 
 const styles = StyleSheet.create({
     btnViewStyle: {
-        backgroundColor: '#009999', 
+        backgroundColor: '#2b84a4', 
         borderRadius: 8, 
         paddingVertical: 15, 
         paddingHorizontal: 20, 
@@ -56,4 +56,65 @@ const styles = StyleSheet.create({
 
 });
 
-export {styles};
+
+const addNewShopStyles = StyleSheet.create({
+    container: {
+        height: '100%', 
+        marginTop: 25, 
+        paddingHorizontal: 30,
+    },
+    headerTextStyles: {
+        color: '#666666', 
+        fontSize: 20,
+        textAlign: 'center'
+    }
+});
+
+const shopListingStyles = StyleSheet.create({
+    container: {
+        flex:1,
+        marginTop: 25, 
+        flexDirection: 'column',
+        marginBottom: 30,
+    },
+    headerTextStyles: {
+        color: '#666666', 
+        fontSize: 20,
+        marginHorizontal:30
+    }
+});
+
+const shopScreenStyles = StyleSheet.create({
+    container: {
+        flex:1, 
+        marginTop: 35, 
+        paddingHorizontal: 30, 
+        flexDirection: 'column', 
+        justifyContent: 'space-between'
+    },
+    shopDescriptionStyles: {
+        color: '#666666', 
+        fontSize: 16,
+        marginTop: 5
+    },
+    qrImageStyles: {
+        height: 250, 
+        width: 250, 
+        resizeMode: "contain", 
+        alignSelf:'center'
+    },
+    btnSaveQRcodeStyles: {
+        fontSize: 20, 
+        color: '#2b84a4',
+        textAlign: 'center', 
+        fontWeight: "bold"
+    },
+    btnDownloadStyles: {
+        fontSize: 18, 
+        color: '#b3b3b3',
+        textAlign: 'center', 
+        paddingHorizontal: 20, 
+        marginBottom: 20 
+    }
+});
+export {styles,addNewShopStyles, shopListingStyles,shopScreenStyles};

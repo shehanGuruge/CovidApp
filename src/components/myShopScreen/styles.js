@@ -14,6 +14,8 @@ const styles = StyleSheet.create({
         shadowColor: '#000',
         alignItems: 'center',
         marginTop: 10,
+        marginHorizontal: 30,
+        marginBottom: 5,
     },
     shopName: {
         color:'#666666',
