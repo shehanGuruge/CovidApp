@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, TouchableOpacity, TextInput, Image, ScrollView, FlatList,AsyncStorage } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, Image, ScrollView, FlatList,AsyncStorage, Alert } from 'react-native';
 import PhoneInput from 'react-native-phone-input';
 import {styles, addNewShopStyles,shopListingStyles,shopScreenStyles} from './styles';
 import {NavigationEvents} from 'react-navigation'
@@ -10,7 +10,7 @@ import {fetchFromAPI} from '../../../helpers/requests';
 import {HTTPMethods} from '../../../constants/HTTPMethods'
 import {Loader} from '../../../components/index';
 
-
+var ownerContactNumber = null;
 export default class MyShopScreen extends Component {
   constructor(props) {
     super(props);
@@ -21,6 +21,12 @@ export default class MyShopScreen extends Component {
         doesExist: null,
         clickedItem: null,
         data: null,
+        shopName: null,
+        shopRegistrationNumber: null,
+        shopmobileNumber: null,
+        shopaddress: null,
+        countryCode: null,
+        country: "lk"
     };
   }
 
@@ -59,16 +65,10 @@ export default class MyShopScreen extends Component {
     AsyncStorage.getItem('_phn_number')
     .then((phnNumber) => {
         this.setState({isVisible:true})
+        this.ownerContactNumber = parseInt(phnNumber)
         this.fetchShopLists(phnNumber)
         .then((doesShopExist) => {
             this.setState({isVisible:false, doesExist: doesShopExist})
-
-            // console.log("SHOP EXISTS: " , doesShopExist);
-            // if(!doesShopExist){
-            //     this.renderNoExistingShopsScreen();
-            // }else{
-            //     return () => this.renderShopListingScreen();
-            // }
         })
     })
   }
@@ -140,7 +140,12 @@ export default class MyShopScreen extends Component {
                     }
                 />
                 
-                <TouchableOpacity onPress = {() => this.handleRegisterNewShop()}>
+                <TouchableOpacity onPress = {() => 
+                    this.setState({
+                        doesExist: null,
+                        clickedItem: null,
+                        isNewShop: true
+                    })}>
                     <View style = {[styles.btnViewStyle,{marginHorizontal: 45}]}>
                         <Text style = {styles.btnTextStyle}>Add My Shop</Text>
                     </View>
@@ -157,22 +162,37 @@ export default class MyShopScreen extends Component {
                         <Text style = {{color: '#666666', fontSize: 20,}}>
                                 Enter your shop details below</Text>
                         <Text style = {[styles.textFieldText, {marginTop: 40}]}> Shop Name</Text>
-                        <TextInput style = {styles.textInputStyle}></TextInput>
+                        <TextInput value = {this.state.shopName}
+                            onChangeText = {value => this.setState({shopName: value})}
+                            style = {styles.textInputStyle}></TextInput>
                     
                         <Text style = {styles.textFieldText}>Shop Registered Number</Text>
-                        <TextInput style = {styles.textInputStyle}></TextInput>
+                        <TextInput value = {this.state.shopRegistrationNumber}
+                            onChangeText = {value => this.setState({shopRegistrationNumber: value})}
+                            style = {styles.textInputStyle}></TextInput>
 
                         <Text style = {styles.textFieldText}>Mobile Number</Text>
                         <View style = {styles.contactNumberView}>
-                            <PhoneInput ref='phone' flagStyle = {{height: 30, width: 30, borderRadius: 20}}/>
-                            <Text style = {styles.contactCode}> +94 </Text>
+
+                            <PhoneInput ref={ref => { this.phone = ref; }}
+                                initialCountry = "lk"
+                                onSelectCountry = {country => this.setState({countryCode: this.phone.getValue(), 
+                                    country:country})} 
+                                flagStyle = {{height: 30, width: 30, borderRadius: 20}}/>
+
+                            <Text style = {styles.contactCode}> {this.state.countryCode} </Text>
                             <Image source = {require('../../../../assets/menu.png')} style = {styles.dropdownImageStyle} />
                             <View style = {styles.verticalDividerStyle}></View>
-                            <TextInput style = {{width: '100%'}} keyboardType = "number-pad"></TextInput>
+                            <TextInput value = {this.state.shopmobileNumber}
+                                onChangeText = {value => this.setState({shopmobileNumber: value})}
+                                style = {{width: '100%'}} 
+                                keyboardType = "number-pad"></TextInput>
                         </View>
                         
                         <Text style = {styles.textFieldText}>Address</Text>
-                        <TextInput style = {styles.textInputStyle}></TextInput>
+                        <TextInput value = {this.state.shopAddress}
+                            onChangeText = {value => this.setState({shopAddress: value})}
+                            style = {styles.textInputStyle}></TextInput>
                         
                         <TouchableOpacity onPress = {() => this.handleRegisterNewShop()}>
                             <View style = {styles.btnViewStyle}>
@@ -198,9 +218,6 @@ export default class MyShopScreen extends Component {
                     <View style = {{alignSelf: 'center', marginTop: 50}}>
                         <QRCode value = {this.state.clickedItem.reg_id} size = {250} bgColor = "black" fgColor = "white" />
                     </View>
-            
-                    
-
                     <TouchableOpacity>
                         <Text style = {shopScreenStyles.btnSaveQRcodeStyles}>Save QR Code</Text>
                     </TouchableOpacity>
@@ -215,11 +232,93 @@ export default class MyShopScreen extends Component {
 
 
   handleRegisterNewShop = () => {
-      this.setState({
-          doesExist: null,
-          clickedItem: null,
-          isNewShop: true
-      })
+      if(this.state.shopName !== null && this.state.shopRegistrationNumber !== null && 
+        this.state.shopmobileNumber !== null && this.state.shopAddress !== null){
+
+            this.setState({isVisible: true})
+            this.checkShopAvailabilityById(this.state.shopRegistrationNumber)
+            .then((response) => {
+                console.log("SHOP EXIST: " , response);
+                if(response === false){
+                    var url = BASE_URL + shop_endpoints.CREATE_NEW_SHOP;
+                    var body = {
+                        "phoneNumber": this.ownerContactNumber,
+                        "reg_id": this.state.shopRegistrationNumber,
+                        "name": "Malith",
+                        "address1": this.state.shopaddress,
+                        "address2": "Gorakana",
+                        "city": "Moratuwa",
+                        "state": "Western",
+                        "post_code": "13500",
+                        "country": this.state.country.toUpperCase(),
+                        "nature_of_business": "Food",
+                        "qr_code": "base-64"
+                    }
+
+                    fetchFromAPI({URL: url, request_method: HTTPMethods.POST, body: JSON.stringify(body)})
+                    .then((response) => {
+                        console.log(response)
+                        this.setState({isVisible: false})
+                        if(response.code === 500){
+                            Alert.alert("Covid app", "Please try again later");
+                        }else{
+                            Alert.alert("Covid App", "Shop Created Successfully",
+                            [
+                                {
+                                    text: "OK",
+                                    onPress: () => {this.reloadScreen()}
+                                }
+                            ]
+                            );
+                        }
+                    })
+                    .catch((err) => {
+                        this.setState({isVisible: false})
+                        console.log(err)
+                        Alert.alert("Covid app", "Please try again later");
+                    })
+                }else{
+                    this.setState({isVisible:false})
+                    Alert.alert("Covid app", "A shop with the same registration Id exists. Please try with a different registration id");
+                }
+            })
+
+        }else{
+            Alert.alert("Covid App", "Please make sure you have filled all the required fields.");
+        }
+
+  }
+
+  checkShopAvailabilityById = (reg_id) => {
+    var url = BASE_URL + shop_endpoints.DOES_SHOP_EXISTS + "\"" + reg_id + "\"";
+    return new Promise((resolve, reject) => {
+        fetchFromAPI({URL:url, request_method: HTTPMethods.GET})
+        .then((response) => {
+
+            response.code === 404 ? resolve(false) : resolve(true)
+        })
+        .catch((err) => {
+            Alert.alert("Covid App", "Please try again later");
+            console.log(err);
+            reject(err);
+        })
+    })
+    
+  }
+
+
+  reloadScreen = () => {
+    this.setState({
+        isVisible: true,
+        isNewShop: null,
+        data: null
+    })
+
+    this.fetchShopLists(this.ownerContactNumber)
+    .then((doesShopExist) => {
+        this.setState({isVisible:false, doesExist: doesShopExist})
+    })
+    .catch((err) => console.log(err))
   }
 
 

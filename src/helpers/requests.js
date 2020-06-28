@@ -3,7 +3,7 @@ import {HTTPMethods,POSTTYPE} from '../constants/HTTPMethods'
 export async function fetchFromAPI({URL: url, request_method: method, header: _headers, body : _body = ""}){
 
     var request = constructRequest(method,_body)
-    console.log(request)
+    // console.log(request)
     try {
         let response = await fetch(url,request);
         let json = await response.json();

@@ -8,6 +8,7 @@ import {HTTPMethods} from '../../constants/HTTPMethods'
 import {Loader} from '../../components/index';
 
 export default class RegistrationScreen extends Component {
+  
   constructor(props) {
     super(props);
     this.state = {
@@ -84,18 +85,18 @@ export default class RegistrationScreen extends Component {
                 var url = BASE_URL+user_endpoints.CREATE_NEW_USER;
 
                 var body = {
-                  "phoneNumber": parseInt(this.state.contactNumber),
-                  "name": this.state.name,
-                  "nric": this.state.nic,
                   "address1": this.state.address,
                   "address2": "",
                   "city": "",
-                  "state": "",
+                  "country": this.state.country.toUpperCase(),
+                  "name": this.state.name,
+                  "nric": this.state.nic,
+                  "phoneNumber":  parseInt(this.state.contactNumber),
                   "post_code": "",
-                  "country": this.state.country.toUpperCase()
+                  "state": ""
                 }
       
-                fetchFromAPI({URL:url, request_method: HTTPMethods.POST, body: body})
+                fetchFromAPI({URL:url, request_method: HTTPMethods.POST, body: JSON.stringify(body)})
                 .then((response) => {
                   console.log(response);
                   this.setState({isVisible:false})

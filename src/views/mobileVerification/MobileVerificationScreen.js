@@ -7,8 +7,19 @@ import {BASE_URL,user_endpoints} from '../../constants/Endpoints';
 import {fetchFromAPI} from '../../helpers/requests';
 import {POSTTYPE,HTTPMethods} from '../../constants/HTTPMethods'
 import {Loader} from '../../components/index';
+import {initFirebase} from '../../config/index';
+import Firebase from 'firebase'
 
 export default class MobileVerificationScreen extends Component {
+
+  UNSAFE_componentWillMount(){
+    try{
+      initFirebase();
+    }catch(err){
+      console.log(err)
+    }
+  }
+
   constructor(props) {
     super(props);
     this.state = {
@@ -75,6 +86,7 @@ export default class MobileVerificationScreen extends Component {
                   AsyncStorage.setItem("_phn_number", this.state.contactNumber)
                   .then(() => {
                     this.props.navigation.navigate('tabScreens');
+                    // this.handleMobileAuthentication();
                   })
                   
               }else{
@@ -86,5 +98,19 @@ export default class MobileVerificationScreen extends Component {
             console.log(err)
           })
       }
+  }
+
+  handleMobileAuthentication = () => {
+    recaptcha = new Firebase.auth.RecaptchaVerifier("",{
+      'size': 'invisible',
+      'callback': function(response) {
+        // reCAPTCHA solved, allow signInWithPhoneNumber.
+        console.log(response)
+      }
+    })
+    // Firebase.auth().signInWithPhoneNumber(this.state.contactNumber)
+    // .then(confirmResult => {
+    //     console.log(confirmResult)
+    // })
   }
 }
