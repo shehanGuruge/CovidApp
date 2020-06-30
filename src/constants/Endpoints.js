@@ -17,4 +17,11 @@ const shop_endpoints = {
 }
 
 
-export {BASE_URL, user_endpoints, shop_endpoints}
+const checkin_endpoints = {
+    GET_CHECKING_DETAILS : "user/check-in?phoneNumber=",
+    CHECK_IN : "check-in",
+    GET_PERSONALIZED_CHECKINS : "shop/check-in?shop_reg_id=",
+}
+
+
+export {BASE_URL, user_endpoints, shop_endpoints,checkin_endpoints}

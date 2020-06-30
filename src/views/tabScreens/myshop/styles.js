@@ -101,7 +101,8 @@ const shopScreenStyles = StyleSheet.create({
         height: 250, 
         width: 250, 
         resizeMode: "contain", 
-        alignSelf:'center'
+        alignSelf:'center',
+        marginTop: 50,
     },
     btnSaveQRcodeStyles: {
         fontSize: 20, 

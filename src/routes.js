@@ -5,7 +5,6 @@ import {createBottomTabNavigator} from 'react-navigation-tabs'
 import {createAppContainer} from 'react-navigation'
 import {MobileVerificationScreen,RegistrationScreen,OtpScreen, ScanQRScreen, HomeScreen,MyShopScreen,
     ProfileScreen, WelcomeScreen} from './views/index'
-import QRIcon from '../assets/qr-code.svg';
 
 const MainStackNavigator = createStackNavigator({
     Welcome: {
@@ -81,7 +80,7 @@ const MainStackNavigator = createStackNavigator({
         }
         ),
         navigationOptions: {
-            headerTitle: 'Co-vid App',
+            headerTitle: 'Let Me In',
             headerLeft: null,
             headerTitleStyle: {
                 textAlign:'center',

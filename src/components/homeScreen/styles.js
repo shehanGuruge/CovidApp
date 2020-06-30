@@ -12,6 +12,7 @@ const styles = StyleSheet.create({
         shadowOffset: {width: 0, height: 0},
         shadowColor: '#000',
         marginTop: 10,
+        marginBottom: 10,
     },
     shopName: {
         color:'#666666',

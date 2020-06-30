@@ -3,10 +3,12 @@ import { View, Text , TouchableOpacity} from 'react-native';
 import WelcomeImage from '../../../assets/home.svg'
 import {styles} from './styles'
 
+
 export default class WelcomeScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      isFetching: false
     };
   }
 

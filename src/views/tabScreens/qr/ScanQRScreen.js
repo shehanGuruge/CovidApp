@@ -1,8 +1,12 @@
 import React, { Component } from 'react';
-import { View, Text , Image, TextInput} from 'react-native';
+import { View, Text , Image, TextInput, AsyncStorage, Alert} from 'react-native';
 import * as Permissions from 'expo-permissions'
 import {BarCodeScanner} from 'expo-barcode-scanner'
 import {popupStyles} from './styles'
+import {BASE_URL,checkin_endpoints} from '../../../constants/Endpoints';
+import {fetchFromAPI} from '../../../helpers/requests';
+import {HTTPMethods} from '../../../constants/HTTPMethods'
+import {Loader} from '../../../components/index';
 
 var celciusDegreeSymbol = '°'
 export default class ScanQRScreen extends Component {
@@ -15,6 +19,7 @@ export default class ScanQRScreen extends Component {
         showTemperaturePopup: false,
         barcodeData : null,
         tempReading: null,
+        isFetching: false,
     };
   }
 
@@ -30,7 +35,7 @@ export default class ScanQRScreen extends Component {
   render() {
     return (
         <View style = {{flex: 1, backgroundColor: '#fff'}}>
-
+            <Loader isVisible = {this.state.isFetching}/>
       
         {this.state.hasCameraPermissions === true &&
             <View style = {{flex: 1, flexDirection: 'column', alignItems: 'center', backgroundColor: '#fff'}}>
@@ -95,8 +100,36 @@ export default class ScanQRScreen extends Component {
   }
 
   handleTempSubmit = () => {
-    this.setState({
-        showTemperaturePopup: false
-    })
+    this.setState({ showTemperaturePopup: false  })
+
+    if(this.state.tempReading !== "" || this.state.tempReading !== "0"){
+        AsyncStorage.getItem("_phn_number")
+        .then((phnNumber) => {
+            var url = BASE_URL + checkin_endpoints.CHECK_IN;
+            var _body = {
+                "phoneNumber" : phnNumber, 
+                "shop_reg_id" : this.state.barcodeData, 
+                "temp": this.state.tempReading, 
+                "check_in_at" : new Date().toISOString(),
+            }
+    
+            this.setState({isFetching: true})
+            fetchFromAPI({URL:url, request_method: HTTPMethods.POST,body: JSON.stringify(_body)})
+            .then((response) => {
+                this.setState({ isFetching: false});
+                if(response.code === 200){
+                    Alert.alert("Let Me In", "QR Code scanned successfully");
+                }else{
+                    Alert.alert("Let Me In", "Invalid QR Code");
+                }
+            })
+            .catch((err) => {Alert.alert("Let Me In", "Network Issue. Please try again")});
+        })
+    }else {
+        Alert.alert("Let Me In", "Please recheck the temperature you have entered");
+    }
+    
+   
+
   }
 }

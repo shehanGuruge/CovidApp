@@ -106,7 +106,7 @@ export default class MyShopScreen extends Component {
                 <Image source = {require('../../../../assets/temp/sample-qr.png')}
                         style = {shopScreenStyles.qrImageStyles}/>
             
-                <TouchableOpacity onPress = {() => this.props.navigation.navigate('Otp')}>
+                <TouchableOpacity onPress = {() => {this.setState({isNewShop : true, doesExist: null})}}>
                     <View style = {[styles.btnViewStyle,
                                     {marginTop: 100, 
                                     marginHorizontal: 50}]}>
@@ -136,6 +136,7 @@ export default class MyShopScreen extends Component {
                                     clickedItem: item,
                                 })
                             }}
+                            shopName = {item.name}
                             shopAddress = {item.address1 + " " + item.address2.toUpperCase()}/> 
                     }
                 />
@@ -190,8 +191,8 @@ export default class MyShopScreen extends Component {
                         </View>
                         
                         <Text style = {styles.textFieldText}>Address</Text>
-                        <TextInput value = {this.state.shopAddress}
-                            onChangeText = {value => this.setState({shopAddress: value})}
+                        <TextInput value = {this.state.shopaddress}
+                            onChangeText = {value => this.setState({shopaddress: value})}
                             style = {styles.textInputStyle}></TextInput>
                         
                         <TouchableOpacity onPress = {() => this.handleRegisterNewShop()}>
@@ -244,7 +245,7 @@ export default class MyShopScreen extends Component {
                     var body = {
                         "phoneNumber": this.ownerContactNumber,
                         "reg_id": this.state.shopRegistrationNumber,
-                        "name": "Malith",
+                        "name": this.state.shopName,
                         "address1": this.state.shopaddress,
                         "address2": "Gorakana",
                         "city": "Moratuwa",
@@ -260,9 +261,9 @@ export default class MyShopScreen extends Component {
                         console.log(response)
                         this.setState({isVisible: false})
                         if(response.code === 500){
-                            Alert.alert("Covid app", "Please try again later");
+                            Alert.alert("Let Me In", "Please try again later");
                         }else{
-                            Alert.alert("Covid App", "Shop Created Successfully",
+                            Alert.alert("Let Me In", "Shop Created Successfully",
                             [
                                 {
                                     text: "OK",
@@ -275,16 +276,16 @@ export default class MyShopScreen extends Component {
                     .catch((err) => {
                         this.setState({isVisible: false})
                         console.log(err)
-                        Alert.alert("Covid app", "Please try again later");
+                        Alert.alert("Let Me In", "Please try again later");
                     })
                 }else{
                     this.setState({isVisible:false})
-                    Alert.alert("Covid app", "A shop with the same registration Id exists. Please try with a different registration id");
+                    Alert.alert("Let Me In", "A shop with the same registration Id exists. Please try with a different registration id");
                 }
             })
 
         }else{
-            Alert.alert("Covid App", "Please make sure you have filled all the required fields.");
+            Alert.alert("Let Me In", "Please make sure you have filled all the required fields.");
         }
 
   }
@@ -298,7 +299,7 @@ export default class MyShopScreen extends Component {
             response.code === 404 ? resolve(false) : resolve(true)
         })
         .catch((err) => {
-            Alert.alert("Covid App", "Please try again later");
+            Alert.alert("Let Me In", "Please try again later");
             console.log(err);
             reject(err);
         })

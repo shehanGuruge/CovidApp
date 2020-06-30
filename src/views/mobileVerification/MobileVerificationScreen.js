@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
-import { View, Text, TouchableOpacity, Image, TextInput, AsyncStorage } from 'react-native';
+import { View, Text, TouchableOpacity, Image, TextInput, AsyncStorage, Alert } from 'react-native';
 import PhoneInput from 'react-native-phone-input'
+import Firebase from 'firebase'
+import {FirebaseRecaptchaVerifierModal} from 'expo-firebase-recaptcha'
 import {styles} from './styles'
 import MobileNumberVerificationImage from '../../../assets/phone-number2.svg';
 import {BASE_URL,user_endpoints} from '../../constants/Endpoints';
@@ -8,8 +10,9 @@ import {fetchFromAPI} from '../../helpers/requests';
 import {POSTTYPE,HTTPMethods} from '../../constants/HTTPMethods'
 import {Loader} from '../../components/index';
 import {initFirebase} from '../../config/index';
-import Firebase from 'firebase'
 
+
+var firebaseConfig;
 export default class MobileVerificationScreen extends Component {
 
   UNSAFE_componentWillMount(){
@@ -18,15 +21,21 @@ export default class MobileVerificationScreen extends Component {
     }catch(err){
       console.log(err)
     }
+    firebaseConfig = Firebase.apps.length ? Firebase.app().options : undefined;
   }
 
+  
   constructor(props) {
     super(props);
+    // 713769217
     this.state = {
-        contactNumber: "713769217",
-        countryCode: 0,
+        contactNumber: "719302755",
+        phoneCode: "+94",
         isErrorMessageVisible: false,
         isVisible: false,
+        country: null,
+        verificationId: null,
+        recaptchaVerifier: null,
     };  
   }
 
@@ -34,14 +43,21 @@ export default class MobileVerificationScreen extends Component {
     return (
       <View style= {styles.outerContainer}>
             <Loader isVisible = {this.state.isVisible}/>
+            <FirebaseRecaptchaVerifierModal ref = {ref => {this.recaptcha = ref}}
+              firebaseConfig = {firebaseConfig}
+              
+            />
             <View style= {{alignSelf: 'center'}}>
                 <MobileNumberVerificationImage height = {290} width = {290}/>
             </View>
             <Text style={styles.contactNumberTextStyle}>Enter your mobile Number</Text>
 
             <View style = {styles.contactNumberView}>
-                <PhoneInput ref='phone' flagStyle = {{height: 30, width: 30, borderRadius: 20}}/>
-                <Text style = {styles.contactCode}> +94 </Text>
+                <PhoneInput ref={ref => { this.phone = ref; }}
+                          initialCountry = "lk"
+                          onSelectCountry = {country => this.setState({phoneCode: this.phone.getValue(), country: country})} 
+                          flagStyle = {{height: 30, width: 30, borderRadius: 20}}/>
+                <Text style = {styles.contactCode}> {this.state.phoneCode} </Text>
                 <Image source = {require('../../../assets/menu.png')} style = {styles.dropdownImageStyle} />
                 <View style = {styles.verticalDividerStyle}></View>
                 <TextInput style = {{width: '100%'}} keyboardType = "phone-pad" 
@@ -85,8 +101,8 @@ export default class MobileVerificationScreen extends Component {
               if(data.code === 200){
                   AsyncStorage.setItem("_phn_number", this.state.contactNumber)
                   .then(() => {
-                    this.props.navigation.navigate('tabScreens');
-                    // this.handleMobileAuthentication();
+                    // this.props.navigation.navigate('tabScreens');
+                    this.handleMobileAuthentication();
                   })
                   
               }else{
@@ -101,16 +117,17 @@ export default class MobileVerificationScreen extends Component {
   }
 
   handleMobileAuthentication = () => {
-    recaptcha = new Firebase.auth.RecaptchaVerifier("",{
-      'size': 'invisible',
-      'callback': function(response) {
-        // reCAPTCHA solved, allow signInWithPhoneNumber.
-        console.log(response)
-      }
-    })
-    // Firebase.auth().signInWithPhoneNumber(this.state.contactNumber)
-    // .then(confirmResult => {
-    //     console.log(confirmResult)
-    // })
+        const phoneProvider = new Firebase.auth.PhoneAuthProvider();
+        phoneProvider.verifyPhoneNumber(
+            this.state.phoneCode+this.state.contactNumber,
+            this.recaptcha
+        ).then((id) => {
+            console.log("ID: " ,id);
+            this.setState({verificationId:id})
+            this.props.navigation.navigate("Otp", {"verificationId": id})
+        }).catch(err => {
+            console.log(err);
+            Alert.alert("Let Me In", "Invalid contact number. Please recheck the mobile number and try again");
+        });
   }
 }

@@ -13,8 +13,12 @@ export default class ProfileScreen extends Component {
     super(props);
     this.state = {
       isVisible: false,
-      data: ""
+      data: []
     };
+  }
+
+  UNSAFE_componentWillMount(){
+    this.fetchUserDetails();
   }
 
   render() {
@@ -35,13 +39,22 @@ export default class ProfileScreen extends Component {
             <Text style = {styles.editButtonStyle}>Edit Picture</Text>
         </TouchableOpacity>
 
-        <Text style = {[{fontSize: 22}, styles.contentStyle]}>{this.state.data[0].name}</Text>
+        {this.state.isVisible === false && this.state.data.length > 0 && 
+            <Text style = {[{fontSize: 22}, styles.contentStyle]}>{this.state.data[0].name}</Text>
+        }
+        
+        {this.state.isVisible === false && this.state.data.length > 0 && 
+            <Text style = {[{fontSize: 20}, styles.contentStyle]}>{this.state.data[0].address1}</Text>
+        }
+        
+        {this.state.isVisible === false && this.state.data.length > 0 && 
+            <Text style = {[{fontSize: 20}, styles.contentStyle]}>92854688921665</Text>
+        }
 
-        <Text style = {[{fontSize: 20}, styles.contentStyle]}>{this.state.data[0].address1}</Text>
-
-        <Text style = {[{fontSize: 20}, styles.contentStyle]}>92854688921665</Text>
-
-        <Text style = {[{fontSize: 20}, styles.contentStyle]}>{this.state.data[0].mobile_no}</Text>
+        {this.state.isVisible === false && this.state.data.length > 0 && 
+            <Text style = {[{fontSize: 20}, styles.contentStyle]}>{this.state.data[0].mobile_no}</Text>
+        }
+  
       </View>
     );
   }
@@ -70,9 +83,12 @@ export default class ProfileScreen extends Component {
           this.setState({
             data: response.data
           })
+
+          
       }else{
-        Alert.alert("Covid App", "Network issue.Please try again later");
+        Alert.alert("Let Me In", "Network issue.Please try again later");
       }
+
     })
     .catch(err => {
       this.setState({isVisible:false})

@@ -11,7 +11,7 @@ const styles = StyleSheet.create({
         height: ScreenDimensions.SCREEN_HEIGHT , 
         justifyContent: 'center',
         alignItems: 'center', 
-        zIndex: 5,
+        zIndex: 10,
         bottom: 0, 
         left: 0, 
         right: 0

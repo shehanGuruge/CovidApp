@@ -81,7 +81,7 @@ export default class RegistrationScreen extends Component {
 
           this.checkUserExistence().
           then((response) => {
-              if(!response){
+              if(response === false){
                 var url = BASE_URL+user_endpoints.CREATE_NEW_USER;
 
                 var body = {
@@ -91,29 +91,29 @@ export default class RegistrationScreen extends Component {
                   "country": this.state.country.toUpperCase(),
                   "name": this.state.name,
                   "nric": this.state.nic,
-                  "phoneNumber":  parseInt(this.state.contactNumber),
+                  "phoneNumber": parseInt(this.state.contactNumber),
                   "post_code": "",
                   "state": ""
                 }
       
-                fetchFromAPI({URL:url, request_method: HTTPMethods.POST, body: JSON.stringify(body)})
+                fetchFromAPI({URL: url, request_method: HTTPMethods.POST, body: JSON.stringify(body)})
                 .then((response) => {
                   console.log(response);
                   this.setState({isVisible:false})
                   response.code === 201 ? 
-                        this.props.navigation.navigate('tabScreens') 
-                        : Alert.alert("Covid App", "Please try again later");
+                        this.props.navigation.navigate('MobileVerification') 
+                        : Alert.alert("Let Me In", "Please try again later");
 
                 }).catch(err => {this.setState({isVisible:false})})
 
               }else{
-                Alert.alert("Covid App", "User already exists with the same contact number.Please login to the application");
+                Alert.alert("Let Me In", "User already exists with the same contact number.Please login to the application");
               }
           })
           
 
       }else{
-        Alert.alert("Covid Application" , "Please note that all the fields were required for registration");
+        Alert.alert("Let Me In" , "Please note that all the fields were required for registration");
       }
   }
 

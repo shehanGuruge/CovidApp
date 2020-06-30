@@ -16,7 +16,7 @@ export default class ShopItem extends Component {
     return (
       <View style = {styles.listItemView}>
         <View style = {{flexDirection: 'column'}}>
-    <Text style = {styles.shopName}>SUNWAT BANRADER</Text>
+    <Text style = {styles.shopName}>{this.props.shopName}</Text>
             <Text style = {styles.shopAddress} numberOfLines = {1} ellipsizeMode = "tail">{this.props.shopAddress}</Text>
         </View>
         <TouchableOpacity onPress = {this.props.onPress}>
