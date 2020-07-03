@@ -21,9 +21,6 @@
     "assetBundlePatterns": [
       "**/*"
     ],
-    "ios": {
-      "supportsTablet": true
-    },
     "packagerOpts": {
       "config": "metro.config.js",
       "sourceExts": [
@@ -39,6 +36,14 @@
         "wasm",
         "svg"
       ]
+    },
+    "ios": {
+      "bundleIdentifier": "com.revportx.letmein",
+      "buildNumber": "1.0.0"
+    },
+    "android": {
+      "package": "com.revportx.letmein",
+      "versionCode": 1
     }
   }
 }

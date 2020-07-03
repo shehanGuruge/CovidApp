@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { View, Text , TouchableOpacity} from 'react-native';
 import WelcomeImage from '../../../assets/home.svg'
 import {styles} from './styles'
-
+import RNHTMLtoPDF from 'react-native-html-to-pdf';
 
 export default class WelcomeScreen extends Component {
   constructor(props) {
@@ -10,6 +10,21 @@ export default class WelcomeScreen extends Component {
     this.state = {
       isFetching: false
     };
+  }
+
+  async createPDF() {
+    let options = {
+      html: '<h1>PDF TEST</h1>',
+      fileName: 'test',
+      directory: 'Documents',
+    };
+ 
+     RNHTMLtoPDF.convert(options)
+    .then((response) => {
+      console.log(response)
+    })
+    // console.log(file.filePath);
+    // console.log(file.filePath);
   }
 
   render() {
@@ -23,6 +38,7 @@ export default class WelcomeScreen extends Component {
         <Text style = {[styles.welcomeTextStyles,{fontSize: 16}]}>with us by simply scanning the QR Code</Text>
         <Text style = {[styles.welcomeTextStyles,{fontSize: 16}]}>at the shop</Text>
 
+        {/* this.props.navigation.navigate('MobileVerification') */}
         <TouchableOpacity onPress = {() => this.props.navigation.navigate('MobileVerification')}>
             <View style = {styles.btnViewStyle}>
                 <Text style = {styles.btnTextStyle}>Login</Text>
