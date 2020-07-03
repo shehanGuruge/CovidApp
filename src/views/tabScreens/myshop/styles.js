@@ -87,7 +87,7 @@ const shopListingStyles = StyleSheet.create({
 const shopScreenStyles = StyleSheet.create({
     container: {
         flex:1, 
-        marginTop: 35, 
+        marginTop: 15, 
         paddingHorizontal: 30, 
         flexDirection: 'column', 
         justifyContent: 'space-between'

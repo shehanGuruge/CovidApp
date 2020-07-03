@@ -1,22 +1,29 @@
 import React, { Component } from 'react';
-import { View, Text, TouchableOpacity, TextInput, Image, ScrollView, FlatList,AsyncStorage, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, Image, ScrollView, FlatList,AsyncStorage, Alert, Picker } from 'react-native';
 import PhoneInput from 'react-native-phone-input';
 import {styles, addNewShopStyles,shopListingStyles,shopScreenStyles} from './styles';
 import {NavigationEvents} from 'react-navigation'
-import {ShopItem} from '../../../components/index';
+import {ShopItem,ShopCheckingItem} from '../../../components/index';
 import QRCode from 'react-native-qrcode-generator';
-import {BASE_URL,shop_endpoints} from '../../../constants/Endpoints';
+import {BASE_URL,shop_endpoints,checkin_endpoints} from '../../../constants/Endpoints';
 import {fetchFromAPI} from '../../../helpers/requests';
-import {HTTPMethods} from '../../../constants/HTTPMethods'
+import {HTTPMethods, statusCode} from '../../../constants/HTTPMethods'
 import {Loader} from '../../../components/index';
+import {ScreenDimensions} from '../../../utils/index'
+import {tempToColor} from '../../../helpers/converters/tempToColorConverter'
 
 var ownerContactNumber = null;
+var daysOfTheWeek = ["Sun" , "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+var base64_qr = null;
+
 export default class MyShopScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
         isVisible: false,
         isNewShop: null,
+        viewWhoCheckedIn: null,
         isExistingShop: null,
         doesExist: null,
         clickedItem: null,
@@ -24,9 +31,16 @@ export default class MyShopScreen extends Component {
         shopName: null,
         shopRegistrationNumber: null,
         shopmobileNumber: null,
-        shopaddress: null,
         countryCode: null,
-        country: "lk"
+        country: "lk",
+        natureOfBusiness: "",
+        state: "",
+        addressLine1: "",
+        addressLine2: "",
+        postalCode: "",
+        city: "",
+        doRenderShopScreen: false,
+        whoCheckedIn : null,
     };
   }
 
@@ -46,6 +60,7 @@ export default class MyShopScreen extends Component {
                             clickedItem: null,
                             doesExist: null,
                             isNewShop: null,
+                            whoCheckedIn: null,
                         })
                     }
                 }
@@ -55,6 +70,7 @@ export default class MyShopScreen extends Component {
             {this.renderNoExistingShopsScreen()}
             {this.renderShopScreen()}
             {this.renderRegisterShopScreen()}
+            {this.renderShopCheckinScreen()}
             
       </View>
     );
@@ -78,7 +94,7 @@ export default class MyShopScreen extends Component {
         return new Promise((resolve, reject) => {
             fetchFromAPI({URL: url, request_method: HTTPMethods.GET})
             .then((response) => {
-                if(response.code === 404){
+                if(statusCode.UNSUCCESSFUL.includes(response.code)){
                     resolve(false)
                 }else {
                     this.setState({
@@ -134,10 +150,12 @@ export default class MyShopScreen extends Component {
                                 this.setState({
                                     doesExist: null,
                                     clickedItem: item,
+                                    doRenderShopScreen: true,
                                 })
                             }}
                             shopName = {item.name}
-                            shopAddress = {item.address1 + " " + item.address2.toUpperCase()}/> 
+                            addressLine1 = {item.address1 !== null ? item.address1.toUpperCase() : "-"}
+                            addressLine2 = {item.address2 !== null ? item.address2.toUpperCase() : "-"}/> 
                     }
                 />
                 
@@ -162,41 +180,73 @@ export default class MyShopScreen extends Component {
                 <View style = {{height: '100%', marginTop: 25, paddingHorizontal: 30}}>
                         <Text style = {{color: '#666666', fontSize: 20,}}>
                                 Enter your shop details below</Text>
-                        <Text style = {[styles.textFieldText, {marginTop: 40}]}> Shop Name</Text>
-                        <TextInput value = {this.state.shopName}
-                            onChangeText = {value => this.setState({shopName: value})}
-                            style = {styles.textInputStyle}></TextInput>
-                    
-                        <Text style = {styles.textFieldText}>Shop Registered Number</Text>
-                        <TextInput value = {this.state.shopRegistrationNumber}
-                            onChangeText = {value => this.setState({shopRegistrationNumber: value})}
-                            style = {styles.textInputStyle}></TextInput>
-
-                        <Text style = {styles.textFieldText}>Mobile Number</Text>
-                        <View style = {styles.contactNumberView}>
-
-                            <PhoneInput ref={ref => { this.phone = ref; }}
-                                initialCountry = "lk"
-                                onSelectCountry = {country => this.setState({countryCode: this.phone.getValue(), 
-                                    country:country})} 
-                                flagStyle = {{height: 30, width: 30, borderRadius: 20}}/>
-
-                            <Text style = {styles.contactCode}> {this.state.countryCode} </Text>
-                            <Image source = {require('../../../../assets/menu.png')} style = {styles.dropdownImageStyle} />
-                            <View style = {styles.verticalDividerStyle}></View>
-                            <TextInput value = {this.state.shopmobileNumber}
-                                onChangeText = {value => this.setState({shopmobileNumber: value})}
-                                style = {{width: '100%'}} 
-                                keyboardType = "number-pad"></TextInput>
-                        </View>
                         
-                        <Text style = {styles.textFieldText}>Address</Text>
-                        <TextInput value = {this.state.shopaddress}
-                            onChangeText = {value => this.setState({shopaddress: value})}
-                            style = {styles.textInputStyle}></TextInput>
+                        <ScrollView style = {{marginBottom: 30}}>
+                            <Text style = {[styles.textFieldText, {marginTop: 40}]}> Shop Name</Text>
+                            <TextInput value = {this.state.shopName}
+                                onChangeText = {value => this.setState({shopName: value})}
+                                style = {styles.textInputStyle}></TextInput>
+                        
+                            <Text style = {styles.textFieldText}>Shop Registered Number</Text>
+                            <TextInput value = {this.state.shopRegistrationNumber}
+                                onChangeText = {value => this.setState({shopRegistrationNumber: value})}
+                                style = {styles.textInputStyle}></TextInput>
+
+                            <Text style = {styles.textFieldText}>Address Line 1</Text>
+                            <TextInput value = {this.state.addressLine1}
+                                onChangeText = {value => this.setState({addressLine1: value})}
+                                style = {styles.textInputStyle}></TextInput>
+
+                            <Text style = {styles.textFieldText}>Address Line 2</Text>
+                            <TextInput value = {this.state.addressLine2}
+                                onChangeText = {value => this.setState({addressLine2: value})}
+                                style = {styles.textInputStyle}></TextInput>
+
+                        
+                            <Text style = {styles.textFieldText}>City</Text>
+                            <TextInput style = {styles.textInputStyle}
+                                        value = {this.state.city}
+                                        onChangeText = {value => this.setState({city: value})}>
+                            </TextInput>
+
+                            <View style = {{flexDirection: 'row', justifyContent: 'space-between'}}>
+                                <View>
+                                    <Text style = {styles.textFieldText}>State</Text>
+                                    <TextInput style = {[styles.textInputStyle, {width: ScreenDimensions.SCREEN_WIDTH/2 - 50}]}
+                                                value = {this.state.state}
+                                                onChangeText = {value => this.setState({state: value})}>
+                                    </TextInput>
+                                </View>
+
+                                <View>
+                                    <Text style = {styles.textFieldText}>Postal Code</Text>
+                                    <TextInput style = {[styles.textInputStyle, {width: ScreenDimensions.SCREEN_WIDTH/2 - 50}]}
+                                                value = {this.state.postalCode}
+                                                onChangeText = {value => this.setState({postalCode: value})}
+                                                keyboardType = "number-pad">
+                                    </TextInput>
+                                </View>
+                            </View>
+
+                            <Text style = {styles.textFieldText}>State</Text>
+                            <Picker selectedValue={this.state.natureOfBusiness}  
+                                    onValueChange={(itemValue, itemPosition) =>  
+                                        this.setState({natureOfBusiness: itemValue})}  
+                                >  
+                                <Picker.Item label="Restaurants and TakeAways" value="Restaurants and TakeAways" />  
+                                <Picker.Item label="Education and Arts" value="Education and Arts" />  
+                                <Picker.Item label="Retail and Wholesale" value="Retail and Wholesale" />  
+                                <Picker.Item label="Clothing Manufacturing" value="Clothing Manufacturing" />  
+                                <Picker.Item label="Cleaning Services" value="Cleaning Services" />  
+                                <Picker.Item label="Business and Financial Services" value="Business and Financial Services" />
+                                <Picker.Item label="Building and Central Heating" value="Building and Central Heating" />  
+                            </Picker>  
+                            <View style = {{flex:1, height: 2, backgroundColor:"#666666"}}></View>
+
+                        </ScrollView>
                         
                         <TouchableOpacity onPress = {() => this.handleRegisterNewShop()}>
-                            <View style = {styles.btnViewStyle}>
+                            <View style = {[styles.btnViewStyle,{marginTop: 0, marginBottom: 50}]}>
                                 <Text style = {styles.btnTextStyle}>Add My Shop</Text>
                             </View>
                         </TouchableOpacity>
@@ -206,18 +256,31 @@ export default class MyShopScreen extends Component {
   }
 
   renderShopScreen = () => {
-      if(this.state.clickedItem !== null){
+      if(this.state.clickedItem !== null && this.state.doRenderShopScreen !== false){
+          console.log("CLICKED ITEM: " , this.state.clickedItem)
         return(
             <View style = {shopScreenStyles.container}>
-                    <View >
+                {/* this.setState({viewWhoCheckedIn: true, doRenderShopScreen: false}) */}
+                    <TouchableOpacity onPress = {() => this.getShopCheckedInDetails()}>
+                        <Text style = {{alignSelf:'flex-end',color: "#2b84a4"}}>View Check in Details</Text>
+                    </TouchableOpacity>
+                    <View>
                         <Text style = {[shopScreenStyles.shopDescriptionStyles,
-                                        {fontSize: 18}]}>SUNWAY PYRAMID</Text>
-                        <Text style = {shopScreenStyles.shopDescriptionStyles}>{this.state.clickedItem.address1} {this.state.clickedItem.address2.toUpperCase()} </Text>
-                        <Text style = {shopScreenStyles.shopDescriptionStyles}>KOL-2398475150364 </Text>
+                                        {fontSize: 18}]}>{this.state.clickedItem.name}</Text>
+                        <Text style = {shopScreenStyles.shopDescriptionStyles}>
+                            {this.state.clickedItem.address1 !== null ? this.state.clickedItem.address1.toUpperCase() : "-"} {" "}
+                            {this.state.clickedItem.address2 !== null ? this.state.clickedItem.address2.toUpperCase() : "-"} 
+                        </Text>
+
+                        <Text style = {shopScreenStyles.shopDescriptionStyles}>
+                            {this.state.clickedItem.reg_id}
+                        </Text>
+
                         <Text style = {shopScreenStyles.shopDescriptionStyles}>{this.state.clickedItem.mobile_no}</Text>
                     </View>
-                    <View style = {{alignSelf: 'center', marginTop: 50}}>
-                        <QRCode value = {this.state.clickedItem.reg_id} size = {250} bgColor = "black" fgColor = "white" />
+                    <View style = {{alignSelf: 'center', marginTop: 30}}>
+                        <QRCode value = {this.state.clickedItem.reg_id} 
+                                size = {250} bgColor = "black" fgColor = "white"  />
                     </View>
                     <TouchableOpacity>
                         <Text style = {shopScreenStyles.btnSaveQRcodeStyles}>Save QR Code</Text>
@@ -232,9 +295,55 @@ export default class MyShopScreen extends Component {
   }
 
 
+
+  renderShopCheckinScreen = () => {
+      if(this.state.whoCheckedIn !== null){
+          console.log(base64_qr)
+            return(
+                <View style = {shopScreenStyles.container}>
+                    <Text style = {[shopListingStyles.headerTextStyles,{marginLeft: 0}]}> {this.state.clickedItem.name}</Text>
+                    <FlatList
+                        style = {{flex: 1, paddingBottom: 15}}
+                        data={this.state.whoCheckedIn}
+                        keyExtractor={(x, i) => i}
+                        renderItem={({ item }) =>
+                            <ShopCheckingItem
+                                customerName = {item.cus_name}
+                                backColor = {tempToColor(parseInt(item.temp))} 
+                                temperature = {item.temp}
+                                checkedInDateTime = {this.dateTimeConverter(item.check_in_at)}
+                            />
+                        }
+                    />
+                    
+                </View>
+            )
+      }
+  }
+
+
+
+  getShopCheckedInDetails = () => {
+    var url = BASE_URL + checkin_endpoints.GET_PERSONALIZED_CHECKINS + "\"" +this.state.clickedItem.reg_id + "\""
+   
+    this.setState({isVisible: true})
+
+    fetchFromAPI({URL: url, request_method: HTTPMethods.GET})
+    .then((response) => {
+        this.setState({isVisible: false})
+        if(statusCode.SUCCESSFUL.includes(response.code) && response.data.totalShopCheckIn > 0){
+            this.setState({
+                whoCheckedIn: response.data.shopCheckIn,
+                doRenderShopScreen: false,
+            })
+        }else{
+            Alert.alert("Let Me In" , "There are no customers for this shop");
+        }
+    }).catch(err => console.log(err))
+  }
+
   handleRegisterNewShop = () => {
-      if(this.state.shopName !== null && this.state.shopRegistrationNumber !== null && 
-        this.state.shopmobileNumber !== null && this.state.shopAddress !== null){
+      if(this.state.shopRegistrationNumber !== null && this.ownerContactNumber !== null){
 
             this.setState({isVisible: true})
             this.checkShopAvailabilityById(this.state.shopRegistrationNumber)
@@ -246,13 +355,13 @@ export default class MyShopScreen extends Component {
                         "phoneNumber": this.ownerContactNumber,
                         "reg_id": this.state.shopRegistrationNumber,
                         "name": this.state.shopName,
-                        "address1": this.state.shopaddress,
-                        "address2": "Gorakana",
-                        "city": "Moratuwa",
-                        "state": "Western",
-                        "post_code": "13500",
+                        "address1": this.state.addressLine1,
+                        "address2": this.state.addressLine2,
+                        "city": this.state.city,
+                        "state": this.state.state,
+                        "post_code": this.state.postalCode,
                         "country": this.state.country.toUpperCase(),
-                        "nature_of_business": "Food",
+                        "nature_of_business": this.state.natureOfBusiness,
                         "qr_code": "base-64"
                     }
 
@@ -260,7 +369,7 @@ export default class MyShopScreen extends Component {
                     .then((response) => {
                         console.log(response)
                         this.setState({isVisible: false})
-                        if(response.code === 500){
+                        if(statusCode.UNSUCCESSFUL.includes(response.code)){
                             Alert.alert("Let Me In", "Please try again later");
                         }else{
                             Alert.alert("Let Me In", "Shop Created Successfully",
@@ -285,7 +394,7 @@ export default class MyShopScreen extends Component {
             })
 
         }else{
-            Alert.alert("Let Me In", "Please make sure you have filled all the required fields.");
+            Alert.alert("Let Me In", "Please recheck the mobile number and the registration number");
         }
 
   }
@@ -296,7 +405,7 @@ export default class MyShopScreen extends Component {
         fetchFromAPI({URL:url, request_method: HTTPMethods.GET})
         .then((response) => {
 
-            response.code === 404 ? resolve(false) : resolve(true)
+            statusCode.UNSUCCESSFUL.includes(response.code) ? resolve(false) : resolve(true)
         })
         .catch((err) => {
             Alert.alert("Let Me In", "Please try again later");
@@ -322,6 +431,23 @@ export default class MyShopScreen extends Component {
     .catch((err) => console.log(err))
   }
 
+
+  dateTimeConverter = (isoDateTime) => {
+
+    if(isoDateTime !== null){
+        var date = new Date(isoDateTime);
+
+
+        var dateInStringFormat = (date.getDate() < 10 ? "0" + date.getDate() : date.getDate()) + " " + 
+                                months[date.getMonth()] + " " + date.getFullYear();
+        var timeInStringFormat = (date.getUTCHours() < 10 ? "0"+date.getUTCHours() : date.getUTCHours()) + ":" + 
+                                (date.getUTCMinutes() < 10 ? "0"+date.getUTCMinutes() : date.getUTCMinutes()) + "h"
+        
+        var stringDateTime = daysOfTheWeek[date.getDay()] + ", " + dateInStringFormat +" at "+ timeInStringFormat;
+
+        return stringDateTime;
+    }
+  }
 
 
 }

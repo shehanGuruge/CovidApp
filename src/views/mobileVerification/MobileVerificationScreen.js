@@ -18,6 +18,16 @@ export default class MobileVerificationScreen extends Component {
   UNSAFE_componentWillMount(){
     try{
       initFirebase();
+      this.checkUserLoggedIn()
+      .then((isLogged) => {
+        if(isLogged){
+          this.props.navigation.navigate("tabScreens");
+        }
+      })
+      .catch(err => {
+        console.log(err);
+      })
+
     }catch(err){
       console.log(err)
     }
@@ -84,6 +94,22 @@ export default class MobileVerificationScreen extends Component {
     );
   }
 
+
+  verifyNumber = () => {
+    this.checkUserLoggedIn()
+    .then((isLogged) => {
+      if(isLogged){
+        this.props.navigation.navigate("tabScreens");
+      }else{
+        this.handleVerification();
+      }
+    })
+    .catch(err => {
+      console.log(err);
+    })
+
+  }
+
   handleVerification =  () => {
       var url = BASE_URL + user_endpoints.DOES_USER_EXIST;
       if(this.state.contactNumber !== null && this.state.contactNumber !== undefined){
@@ -116,6 +142,25 @@ export default class MobileVerificationScreen extends Component {
       }
   }
 
+
+  checkUserLoggedIn = () => {
+    return new Promise((resolve, reject) => {
+      AsyncStorage.getItem("_isLogged")
+      .then(response => {
+        if(response === "true"){
+          resolve(true)
+        }else {
+          resolve(false)
+        }
+      })
+      .catch(err => {
+        AsyncStorage.setItem("_isLogged", "false")
+        resolve(false)
+      })
+    })
+    
+  }
+
   handleMobileAuthentication = () => {
         const phoneProvider = new Firebase.auth.PhoneAuthProvider();
         phoneProvider.verifyPhoneNumber(
@@ -124,7 +169,11 @@ export default class MobileVerificationScreen extends Component {
         ).then((id) => {
             console.log("ID: " ,id);
             this.setState({verificationId:id})
-            this.props.navigation.navigate("Otp", {"verificationId": id})
+            AsyncStorage.setItem("_isLogged","true")
+            .then(() => {
+              this.props.navigation.navigate("Otp", {"verificationId": id})
+            })
+            
         }).catch(err => {
             console.log(err);
             Alert.alert("Let Me In", "Invalid contact number. Please recheck the mobile number and try again");

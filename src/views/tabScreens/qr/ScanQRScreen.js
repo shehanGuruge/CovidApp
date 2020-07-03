@@ -3,9 +3,9 @@ import { View, Text , Image, TextInput, AsyncStorage, Alert} from 'react-native'
 import * as Permissions from 'expo-permissions'
 import {BarCodeScanner} from 'expo-barcode-scanner'
 import {popupStyles} from './styles'
-import {BASE_URL,checkin_endpoints} from '../../../constants/Endpoints';
+import {BASE_URL,checkin_endpoints, shop_endpoints} from '../../../constants/Endpoints';
 import {fetchFromAPI} from '../../../helpers/requests';
-import {HTTPMethods} from '../../../constants/HTTPMethods'
+import {HTTPMethods, statusCode} from '../../../constants/HTTPMethods'
 import {Loader} from '../../../components/index';
 
 var celciusDegreeSymbol = '°'
@@ -20,6 +20,7 @@ export default class ScanQRScreen extends Component {
         barcodeData : null,
         tempReading: null,
         isFetching: false,
+        hideBarcodeReader: false
     };
   }
 
@@ -51,8 +52,18 @@ export default class ScanQRScreen extends Component {
                     <Image source = {require('../../../../assets/tabbedScreenImages/qrcodescreen/upper-right.png')} 
                     style = {{height: 50, width: 100, resizeMode: 'contain'}}></Image>
                  </View>
-                 <BarCodeScanner  style = {{height: 300, width: 300,  }}
-                        onBarCodeScanned = {this.handleBarCodeScanned} ></BarCodeScanner>
+
+                {this.state.hideBarcodeReader === true &&
+                    <View style = {{height: 300, width: 300,}}>
+                        <View  style = {{backgroundColor: "#000", height: 300, width: 170,alignSelf:'center'}}/>
+                    </View>
+                }
+
+                {this.state.hideBarcodeReader === false &&
+                     <BarCodeScanner  style = {{height: 300, width: 300,  }} 
+                     onBarCodeScanned = {this.handleBarCodeScanned} ></BarCodeScanner>
+                }
+                
                 <View style = {{flexDirection: 'row', justifyContent: 'space-between'}}>
                     <Image source = {require('../../../../assets/tabbedScreenImages/qrcodescreen/bottom-left.png')} 
                     style = {{height: 50, width: 100, resizeMode: 'contain'}}></Image>
@@ -92,13 +103,32 @@ export default class ScanQRScreen extends Component {
   handleBarCodeScanned = ({ data}) => {
       if(data !== null){
         this.setState({
-            showTemperaturePopup: true,
+            isFetching: true,
             barcodeData: data,
+            hideBarcodeReader: true
+        })
+        this.checkShopAvailabilityById()
+        .then((response) => {
+            if(response === true){
+                this.setState({
+                    isFetching: false,
+                    hideBarcodeReader: false,
+                    showTemperaturePopup: true
+                })
+            }else{
+                Alert.alert("Let Me In", "Invalid Registration id. Please scan a valid QR Code");
+                this.setState({
+                    isFetching: false,
+                    hideBarcodeReader: false,
+                })
+            }
         })
       }
       console.log(data)
   }
 
+
+  
   handleTempSubmit = () => {
     this.setState({ showTemperaturePopup: false  })
 
@@ -117,7 +147,7 @@ export default class ScanQRScreen extends Component {
             fetchFromAPI({URL:url, request_method: HTTPMethods.POST,body: JSON.stringify(_body)})
             .then((response) => {
                 this.setState({ isFetching: false});
-                if(response.code === 200){
+                if(statusCode.SUCCESSFUL.includes(response.code)){
                     Alert.alert("Let Me In", "QR Code scanned successfully");
                 }else{
                     Alert.alert("Let Me In", "Invalid QR Code");
@@ -128,8 +158,22 @@ export default class ScanQRScreen extends Component {
     }else {
         Alert.alert("Let Me In", "Please recheck the temperature you have entered");
     }
-    
-   
+  }
 
+
+  checkShopAvailabilityById = () => {
+    var url = BASE_URL + shop_endpoints.DOES_SHOP_EXISTS + "\"" + this.state.barcodeData + "\"";
+    return new Promise((resolve, reject) => {
+        fetchFromAPI({URL:url, request_method: HTTPMethods.GET})
+        .then((response) => {
+            statusCode.UNSUCCESSFUL.includes(response.code) ? resolve(false) : resolve(true)
+        })
+        .catch((err) => {
+            Alert.alert("Let Me In", "Please try again later");
+            console.log(err);
+            reject(err);
+        })
+    })
+    
   }
 }

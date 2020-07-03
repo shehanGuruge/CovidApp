@@ -5,7 +5,7 @@ const styles = StyleSheet.create({
         flex: 1, 
         flexDirection: 'column', 
         backgroundColor: '#fff', 
-        paddingTop: 50, 
+        paddingTop: 15, 
         paddingHorizontal: 25
     },
     profilePictureStyle: {

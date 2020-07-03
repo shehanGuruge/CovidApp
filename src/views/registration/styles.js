@@ -47,8 +47,9 @@ const styles = StyleSheet.create({
         borderRadius: 8, 
         paddingVertical: 15, 
         paddingHorizontal: 20, 
-        marginTop: 50, 
-        marginHorizontal: 15
+        marginTop: 20, 
+        marginHorizontal: 15,
+        marginBottom: 30,
     },
     btnTextStyle: {
         color: '#ffffff', 

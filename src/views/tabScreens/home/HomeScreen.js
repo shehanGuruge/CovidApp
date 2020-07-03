@@ -4,7 +4,7 @@ import {CheckInView} from '../../../components/index'
 import {styles} from './styles'
 import {BASE_URL,checkin_endpoints} from '../../../constants/Endpoints';
 import {fetchFromAPI} from '../../../helpers/requests';
-import {HTTPMethods} from '../../../constants/HTTPMethods'
+import {HTTPMethods,statusCode} from '../../../constants/HTTPMethods'
 import {Loader} from '../../../components/index';
 import {tempToColor} from '../../../helpers/converters/tempToColorConverter';
 import {filterByDate} from '../../../helpers/filters/dateFilter'
@@ -123,7 +123,7 @@ export default class HomeScreen extends Component {
         .then((response) => {
               console.log(response);
               this.setState({ isFetching: false })
-              if(response.data !== null && response.code === 200){
+              if(response.data !== null && statusCode.SUCCESSFUL.includes(response.code)){
                   this.setState({
                       data: response.data,
                       checkindetails: response.data.userCheckIn
