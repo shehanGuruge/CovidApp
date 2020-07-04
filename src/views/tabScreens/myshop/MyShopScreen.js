@@ -11,7 +11,9 @@ import {HTTPMethods, statusCode} from '../../../constants/HTTPMethods'
 import {Loader} from '../../../components/index';
 import {ScreenDimensions} from '../../../utils/index'
 import {tempToColor} from '../../../helpers/converters/tempToColorConverter'
-
+import * as MediaLibrary from 'expo-media-library';
+import * as FileSystem from 'expo-file-system';
+import * as Permissions from 'expo-permissions';
 
 
 var ownerContactNumber = null;
@@ -293,9 +295,10 @@ export default class MyShopScreen extends Component {
                     </View>
                     <View style = {{alignSelf: 'center', marginTop: 30}}>
                         <QRCode value = {this.state.clickedItem.reg_id} 
+                                getImageOnLoad = {(value) => {base64_qr = value}}
                                 size = {250} bgColor = "black" fgColor = "white"  />
                     </View>
-                    <TouchableOpacity>
+                    <TouchableOpacity onPress = {() =>  this.downloadFile()}>
                         <Text style = {shopScreenStyles.btnSaveQRcodeStyles}>Save QR Code</Text>
                     </TouchableOpacity>
 
@@ -462,7 +465,6 @@ export default class MyShopScreen extends Component {
     if(isoDateTime !== null){
         var date = new Date(isoDateTime);
 
-
         var dateInStringFormat = (date.getDate() < 10 ? "0" + date.getDate() : date.getDate()) + " " + 
                                 months[date.getMonth()] + " " + date.getFullYear();
         var timeInStringFormat = (date.getUTCHours() < 10 ? "0"+date.getUTCHours() : date.getUTCHours()) + ":" + 
@@ -497,5 +499,26 @@ export default class MyShopScreen extends Component {
             break;
     }
   }
+
+
+  downloadFile(){
+    const uri = "http://techslides.com/demos/sample-videos/small.mp4"
+    let fileUri = FileSystem.documentDirectory + "small.mp4";
+    FileSystem.downloadAsync(uri, fileUri)
+    .then(({ uri }) => {
+        this.saveFile(uri);
+      })
+      .catch(error => {
+        console.error(error);
+      })
+}
+
+saveFile = async (fileUri) => {
+    const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+    if (status === "granted") {
+        const asset = await MediaLibrary.createAssetAsync(fileUri)
+        await MediaLibrary.createAlbumAsync("Download", asset, false)
+    }
+}
 
 }
