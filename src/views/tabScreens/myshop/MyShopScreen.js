@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, TextInput, Image, ScrollView, FlatList,As
 import PhoneInput from 'react-native-phone-input';
 import {styles, addNewShopStyles,shopListingStyles,shopScreenStyles} from './styles';
 import {NavigationEvents} from 'react-navigation'
-import {ShopItem,ShopCheckingItem} from '../../../components/index';
+import {ShopItem,ShopCheckingItem,BackButton} from '../../../components/index';
 import QRCode from 'react-native-qrcode-generator';
 import {BASE_URL,shop_endpoints,checkin_endpoints} from '../../../constants/Endpoints';
 import {fetchFromAPI} from '../../../helpers/requests';
@@ -13,10 +13,12 @@ import {ScreenDimensions} from '../../../utils/index'
 import {tempToColor} from '../../../helpers/converters/tempToColorConverter'
 
 
+
 var ownerContactNumber = null;
 var daysOfTheWeek = ["Sun" , "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 var base64_qr = null;
+const SCREENS = {FROM_REGISTER_NEW_SHOP : "FROM_REGISTER_NEW_SHOP", FROM_SHOP_DETAILS: "FROM_SHOP_DETAILS" , FROM_SHOP_CHECKING: "FROM_SHOP_CHECKING"}
 
 export default class MyShopScreen extends Component {
   constructor(props) {
@@ -28,12 +30,12 @@ export default class MyShopScreen extends Component {
         isExistingShop: null,
         doesExist: null,
         clickedItem: null,
+        initialState: null,
         data: null,
         shopName: null,
         shopRegistrationNumber: null,
         shopmobileNumber: null,
-        countryCode: null,
-        country: "lk",
+        country: "",
         natureOfBusiness: "",
         state: "",
         addressLine1: "",
@@ -85,7 +87,7 @@ export default class MyShopScreen extends Component {
         this.ownerContactNumber = parseInt(phnNumber)
         this.fetchShopLists(phnNumber)
         .then((doesShopExist) => {
-            this.setState({isVisible:false, doesExist: doesShopExist})
+            this.setState({isVisible:false, doesExist: doesShopExist, initialState: doesShopExist})
         })
     })
   }
@@ -179,7 +181,8 @@ export default class MyShopScreen extends Component {
       if(this.state.isNewShop === true){
             return(
                 <View style = {{height: '100%', marginTop: 25, paddingHorizontal: 30}}>
-                        <Text style = {{color: '#666666', fontSize: 20,}}>
+                    <BackButton onPress = {() => this.handleOnBackClicked(SCREENS.FROM_REGISTER_NEW_SHOP)}/>
+                        <Text style = {{color: '#666666', fontSize: 20, marginTop: 15}}>
                                 Enter your shop details below</Text>
                         
                         <ScrollView style = {{marginBottom: 30}}>
@@ -229,6 +232,12 @@ export default class MyShopScreen extends Component {
                                 </View>
                             </View>
 
+                            <Text style = {styles.textFieldText}>Country</Text>
+                            <TextInput style = {styles.textInputStyle}
+                                        value = {this.state.country}
+                                        onChangeText = {value => this.setState({country: value})}>
+                            </TextInput>
+
                             <Text style = {styles.textFieldText}>State</Text>
                             <Picker selectedValue={this.state.natureOfBusiness}  
                                     onValueChange={(itemValue, itemPosition) =>  
@@ -261,10 +270,13 @@ export default class MyShopScreen extends Component {
           console.log("CLICKED ITEM: " , this.state.clickedItem)
         return(
             <View style = {shopScreenStyles.container}>
-                {/* this.setState({viewWhoCheckedIn: true, doRenderShopScreen: false}) */}
+                <View style = {{flexDirection: "row", justifyContent: 'space-between'}}>
+                    <BackButton onPress = {() => this.handleOnBackClicked(SCREENS.FROM_SHOP_DETAILS)}/>
                     <TouchableOpacity onPress = {() => this.getShopCheckedInDetails()}>
                         <Text style = {{alignSelf:'flex-end',color: "#2b84a4"}}>View Check in Details</Text>
                     </TouchableOpacity>
+                </View>
+
                     <View>
                         <Text style = {[shopScreenStyles.shopDescriptionStyles,
                                         {fontSize: 18}]}>{this.state.clickedItem.name}</Text>
@@ -302,6 +314,7 @@ export default class MyShopScreen extends Component {
           console.log(base64_qr)
             return(
                 <View style = {shopScreenStyles.container}>
+                    <BackButton onPress = {() => this.handleOnBackClicked(SCREENS.FROM_SHOP_CHECKING)}/>
                     <Text style = {[shopListingStyles.headerTextStyles,{marginLeft: 0}]}> {this.state.clickedItem.name}</Text>
                     <FlatList
                         style = {{flex: 1, paddingBottom: 15}}
@@ -343,6 +356,7 @@ export default class MyShopScreen extends Component {
     }).catch(err => console.log(err))
   }
 
+
   handleRegisterNewShop = () => {
       if(this.state.shopRegistrationNumber !== null && this.ownerContactNumber !== null){
 
@@ -361,7 +375,7 @@ export default class MyShopScreen extends Component {
                         "city": this.state.city,
                         "state": this.state.state,
                         "post_code": this.state.postalCode,
-                        "country": this.state.country.toUpperCase(),
+                        "country": this.state.country !== null ? this.state.country.toUpperCase() : this.state.country,
                         "nature_of_business": this.state.natureOfBusiness,
                         "qr_code": "base-64"
                     }
@@ -422,12 +436,22 @@ export default class MyShopScreen extends Component {
     this.setState({
         isVisible: true,
         isNewShop: null,
-        data: null
+        data: null,
+        shopName: null,
+        shopRegistrationNumber: null,
+        shopmobileNumber: null,
+        country: "",
+        natureOfBusiness: "",
+        state: "",
+        addressLine1: "",
+        addressLine2: "",
+        postalCode: "",
+        city: "",
     })
 
     this.fetchShopLists(this.ownerContactNumber)
     .then((doesShopExist) => {
-        this.setState({isVisible:false, doesExist: doesShopExist})
+        this.setState({isVisible:false, doesExist: doesShopExist, initialState: doesShopExist})
     })
     .catch((err) => console.log(err))
   }
@@ -450,5 +474,28 @@ export default class MyShopScreen extends Component {
     }
   }
 
+
+  handleOnBackClicked = (action) => {
+    switch(action){
+        case SCREENS.FROM_REGISTER_NEW_SHOP:
+            this.setState({
+                doesExist: this.state.initialState,
+                isNewShop: false
+            })
+            break;
+        case SCREENS.FROM_SHOP_CHECKING:
+            this.setState({
+                whoCheckedIn: null,
+                doRenderShopScreen: true,
+            })
+            break;
+        case SCREENS.FROM_SHOP_DETAILS:
+            this.setState({
+                doRenderShopScreen: false,
+                doesExist: true,
+            })
+            break;
+    }
+  }
 
 }

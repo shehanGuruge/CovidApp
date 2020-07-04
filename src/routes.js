@@ -89,12 +89,7 @@ const MainStackNavigator = createStackNavigator({
             },
             headerStyle: {
                 backgroundColor: '#2b84a4'
-            },
-            headerRight : () => 
-                <TouchableOpacity>
-                    <Image source= {require('../assets/topNavBarIcons/more.png')} 
-                    style = {{height: 25, width: 25, resizeMode: 'contain', marginRight: 30}}/>
-                </TouchableOpacity>
+            }
         }
     }
 })
