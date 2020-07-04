@@ -351,7 +351,7 @@ export default class MyShopScreen extends Component {
                 doRenderShopScreen: false,
             })
         }else{
-            Alert.alert("Let Me In" , "There are no customers for this shop");
+            Alert.alert("LetMeIn" , "There are no customers for this shop");
         }
     }).catch(err => console.log(err))
   }
@@ -385,9 +385,9 @@ export default class MyShopScreen extends Component {
                         console.log(response)
                         this.setState({isVisible: false})
                         if(statusCode.UNSUCCESSFUL.includes(response.code)){
-                            Alert.alert("Let Me In", "Please try again later");
+                            Alert.alert("LetMeIn", "Please try again later");
                         }else{
-                            Alert.alert("Let Me In", "Shop Created Successfully",
+                            Alert.alert("LetMeIn", "Shop Created Successfully",
                             [
                                 {
                                     text: "OK",
@@ -400,16 +400,16 @@ export default class MyShopScreen extends Component {
                     .catch((err) => {
                         this.setState({isVisible: false})
                         console.log(err)
-                        Alert.alert("Let Me In", "Please try again later");
+                        Alert.alert("LetMeIn", "Please try again later");
                     })
                 }else{
                     this.setState({isVisible:false})
-                    Alert.alert("Let Me In", "A shop with the same registration Id exists. Please try with a different registration id");
+                    Alert.alert("LetMeIn", "A shop with the same registration Id exists. Please try with a different registration id");
                 }
             })
 
         }else{
-            Alert.alert("Let Me In", "Please recheck the mobile number and the registration number");
+            Alert.alert("LetMeIn", "Please recheck the mobile number and the registration number");
         }
 
   }
@@ -423,7 +423,7 @@ export default class MyShopScreen extends Component {
             statusCode.UNSUCCESSFUL.includes(response.code) ? resolve(false) : resolve(true)
         })
         .catch((err) => {
-            Alert.alert("Let Me In", "Please try again later");
+            Alert.alert("LetMeIn", "Please try again later");
             console.log(err);
             reject(err);
         })

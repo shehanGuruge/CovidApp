@@ -140,7 +140,7 @@ export default class OtpScreen extends Component {
   handleVerification = () => {
     var verificationCode = this.getOtp();
     if(verificationCode === null){
-      Alert.alert("Let Me In" ,"Invalid Verification Code")
+      Alert.alert("LetMeIn" ,"Invalid Verification Code")
     }else{
       this.setState({isFetching:true})
       const credential = Firebase.auth.PhoneAuthProvider.credential(
@@ -158,7 +158,7 @@ export default class OtpScreen extends Component {
         this.setState({isFetching:false})
 
         console.log(err);
-        Alert.alert("Let Me In", "Your SMS verification code has been expired." ,[
+        Alert.alert("LetMeIn", "Your SMS verification code has been expired." ,[
           {
             text: "OK",
             onPress: () =>  this.props.navigation.pop()
