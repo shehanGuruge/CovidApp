@@ -14,6 +14,7 @@ import {tempToColor} from '../../../helpers/converters/tempToColorConverter'
 import * as MediaLibrary from 'expo-media-library';
 import * as FileSystem from 'expo-file-system';
 import * as Permissions from 'expo-permissions';
+import * as Print from 'expo-print'
 
 
 var ownerContactNumber = null;
@@ -502,14 +503,18 @@ export default class MyShopScreen extends Component {
 
 
   downloadFile(){
-    const uri = "http://techslides.com/demos/sample-videos/small.mp4"
-    let fileUri = FileSystem.documentDirectory + "small.mp4";
-    FileSystem.downloadAsync(uri, fileUri)
-    .then(({ uri }) => {
-        this.saveFile(uri);
-      })
-      .catch(error => {
-        console.error(error);
+
+    Print.printAsync({
+       html:' <div style = "margin-top: 40%; margin-left: 30%;"><h2 style = "margin-left: 50px; font-size: 45px;">LetMeIn</h2>'
+        +'<img src="' + base64_qr +'"'
+        + 'alt="Red dot" style = "margin-left: 20px; margin-top: 10px;" />'
+        + '<h2 style = "margin-top: 50px;">Scan the QR Code to check in</h2>'
+        + '</div>',
+        width : 612,
+        height : 792,
+  
+      }).then((response) => {
+        console.log(response)
       })
 }
 

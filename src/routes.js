@@ -4,9 +4,15 @@ import {createStackNavigator} from 'react-navigation-stack'
 import {createBottomTabNavigator} from 'react-navigation-tabs'
 import {createAppContainer} from 'react-navigation'
 import {MobileVerificationScreen,RegistrationScreen,OtpScreen, ScanQRScreen, HomeScreen,MyShopScreen,
-    ProfileScreen, WelcomeScreen} from './views/index'
+    ProfileScreen, WelcomeScreen, SplashScreen} from './views/index'
 
 const MainStackNavigator = createStackNavigator({
+    Splash: {
+        screen: SplashScreen,
+        navigationOptions: {
+            headerShown: false,
+        }
+    },
     Welcome: {
         screen: WelcomeScreen,
         navigationOptions: {
@@ -89,10 +95,14 @@ const MainStackNavigator = createStackNavigator({
             },
             headerStyle: {
                 backgroundColor: '#2b84a4'
-            }
+            },
         }
     }
-})
+},
+{
+    initialRouteName: "Splash"
+}
+)
 
 
 const AppContainer = createAppContainer(MainStackNavigator)
