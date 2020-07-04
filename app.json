@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Let Me In",
-    "slug": "CovidApp",
+    "name": "LetMeIn",
+    "slug": "LetMeIn",
     "platforms": [
       "ios",
       "android",

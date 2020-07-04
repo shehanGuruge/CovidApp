@@ -80,7 +80,7 @@ const MainStackNavigator = createStackNavigator({
         }
         ),
         navigationOptions: {
-            headerTitle: 'Let Me In',
+            headerTitle: 'LetMeIn',
             headerLeft: null,
             headerTitleStyle: {
                 textAlign:'center',

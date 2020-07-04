@@ -140,18 +140,18 @@ export default class RegistrationScreen extends Component {
                   this.setState({isVisible:false})
                   statusCode.SUCCESSFUL.includes(response.code) ?
                         this.props.navigation.navigate('MobileVerification') 
-                        : Alert.alert("Let Me In", "Please try again later");
+                        : Alert.alert("LetMeIn", "Please try again later");
 
                 }).catch(err => {this.setState({isVisible:false})})
 
               }else{
-                Alert.alert("Let Me In", "User already exists with the same contact number.Please login to the application");
+                Alert.alert("LetMeIn", "User already exists with the same contact number.Please login to the application");
               }
           })
           
 
       }else{
-        Alert.alert("Let Me In" , "Contact Number is a mandatory field.");
+        Alert.alert("LetMeIn" , "Contact Number is a mandatory field.");
       }
   }
 

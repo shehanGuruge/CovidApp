@@ -176,7 +176,7 @@ export default class MobileVerificationScreen extends Component {
             
         }).catch(err => {
             console.log(err);
-            Alert.alert("Let Me In", "Invalid contact number. Please recheck the mobile number and try again");
+            Alert.alert("LetMeIn", "Invalid contact number. Please recheck the mobile number and try again");
         });
   }
 }

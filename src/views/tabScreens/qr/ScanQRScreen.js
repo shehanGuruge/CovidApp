@@ -116,7 +116,7 @@ export default class ScanQRScreen extends Component {
                     showTemperaturePopup: true
                 })
             }else{
-                Alert.alert("Let Me In", "Invalid Registration id. Please scan a valid QR Code");
+                Alert.alert("LetMeIn", "Invalid Registration id. Please scan a valid QR Code");
                 this.setState({
                     isFetching: false,
                     hideBarcodeReader: false,
@@ -148,15 +148,15 @@ export default class ScanQRScreen extends Component {
             .then((response) => {
                 this.setState({ isFetching: false});
                 if(statusCode.SUCCESSFUL.includes(response.code)){
-                    Alert.alert("Let Me In", "QR Code scanned successfully");
+                    Alert.alert("LetMeIn", "QR Code scanned successfully");
                 }else{
-                    Alert.alert("Let Me In", "Invalid QR Code");
+                    Alert.alert("LetMeIn", "Invalid QR Code");
                 }
             })
-            .catch((err) => {Alert.alert("Let Me In", "Network Issue. Please try again")});
+            .catch((err) => {Alert.alert("LetMeIn", "Network Issue. Please try again")});
         })
     }else {
-        Alert.alert("Let Me In", "Please recheck the temperature you have entered");
+        Alert.alert("LetMeIn", "Please recheck the temperature you have entered");
     }
   }
 
@@ -169,7 +169,7 @@ export default class ScanQRScreen extends Component {
             statusCode.UNSUCCESSFUL.includes(response.code) ? resolve(false) : resolve(true)
         })
         .catch((err) => {
-            Alert.alert("Let Me In", "Please try again later");
+            Alert.alert("LetMeIn", "Please try again later");
             console.log(err);
             reject(err);
         })
