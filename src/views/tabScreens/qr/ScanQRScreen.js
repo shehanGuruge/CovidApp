@@ -148,7 +148,7 @@ export default class ScanQRScreen extends Component {
             .then((response) => {
                 this.setState({ isFetching: false});
                 if(statusCode.SUCCESSFUL.includes(response.code)){
-                    Alert.alert("Check In Successful!", "Please enter the shop now!");
+                    Alert.alert("Check In Successful!", "Please enter to the shop now!");
                 }else{
                     Alert.alert("Check In Failed!", "Unable to check in. Please try again");
                 }
