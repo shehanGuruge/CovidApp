@@ -242,7 +242,7 @@ export default class MyShopScreen extends Component {
                                         onChangeText = {value => this.setState({country: value})}>
                             </TextInput>
 
-                            <Text style = {styles.textFieldText}>State</Text>
+                            <Text style = {styles.textFieldText}>Nature of Business</Text>
                             <Picker selectedValue={this.state.natureOfBusiness}  
                                     onValueChange={(itemValue, itemPosition) =>  
                                         this.setState({natureOfBusiness: itemValue})}  
