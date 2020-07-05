@@ -394,9 +394,9 @@ export default class MyShopScreen extends Component {
                         console.log(response)
                         this.setState({isVisible: false})
                         if(statusCode.UNSUCCESSFUL.includes(response.code)){
-                            Alert.alert("LetMeIn", "Please try again later");
+                            Alert.alert("Warning", "Please try again later");
                         }else{
-                            Alert.alert("LetMeIn", "Shop Created Successfully",
+                            Alert.alert("Success", "Shop Created Successfully",
                             [
                                 {
                                     text: "OK",
@@ -409,16 +409,16 @@ export default class MyShopScreen extends Component {
                     .catch((err) => {
                         this.setState({isVisible: false})
                         console.log(err)
-                        Alert.alert("LetMeIn", "Please try again later");
+                        Alert.alert("Warning", "Please try again later");
                     })
                 }else{
                     this.setState({isVisible:false})
-                    Alert.alert("LetMeIn", "A shop with the same registration Id exists. Please try with a different registration id");
+                    Alert.alert("Registration Id Exists!", "A shop with the same registration Id exists. \n\n Please try with a different registration id");
                 }
             })
 
         }else{
-            Alert.alert("LetMeIn", "Please recheck the mobile number and the registration number");
+            Alert.alert("Invalid Data!", "Please recheck the mobile number and the registration number");
         }
 
   }
@@ -432,7 +432,7 @@ export default class MyShopScreen extends Component {
             statusCode.UNSUCCESSFUL.includes(response.code) ? resolve(false) : resolve(true)
         })
         .catch((err) => {
-            Alert.alert("LetMeIn", "Please try again later");
+            Alert.alert("Warning", "Please try again later");
             console.log(err);
             reject(err);
         })
