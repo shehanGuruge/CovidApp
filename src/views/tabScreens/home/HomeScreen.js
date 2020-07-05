@@ -116,7 +116,7 @@ export default class HomeScreen extends Component {
     AsyncStorage.getItem("_phn_number")
     .then((phnNumber) => {
         phoneNumber = phnNumber;
-        var url = BASE_URL + checkin_endpoints.GET_CHECKING_DETAILS + 112898395
+        var url = BASE_URL + checkin_endpoints.GET_CHECKING_DETAILS + phoneNumber
         this.setState({isFetching:true})
 
         fetchFromAPI({URL: url, request_method: HTTPMethods.GET})
