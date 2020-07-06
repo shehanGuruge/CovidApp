@@ -128,7 +128,6 @@ export default class ScanQRScreen extends Component {
                         }
                     }
                 ]);
-                
             }
         })
       }
@@ -140,7 +139,7 @@ export default class ScanQRScreen extends Component {
   handleTempSubmit = () => {
     this.setState({ showTemperaturePopup: false  })
 
-    if(this.state.tempReading !== "" || this.state.tempReading !== "0"){
+    if((this.state.tempReading !== "" || this.state.tempReading !== "0") && this.state.tempReading > 35 ){
         AsyncStorage.getItem("_phn_number")
         .then((phnNumber) => {
             var url = BASE_URL + checkin_endpoints.CHECK_IN;
@@ -158,15 +157,17 @@ export default class ScanQRScreen extends Component {
                 console.log(response)
                 this.setState({ isFetching: false, hideBarcodeReader: false});
                 if(statusCode.SUCCESSFUL.includes(response.code)){
-                    Alert.alert("LetMeIn", "QR Code scanned successfully");
+                    Alert.alert("Check In Successful!", "Please enter to the shop now!");
                 }else{
-                    Alert.alert("LetMeIn", "Invalid QR Code");
+                    Alert.alert("Check In Failed!", "Unable to check in. Please try again");
                 }
             })
-            .catch((err) => {Alert.alert("LetMeIn", "Network Issue. Please try again")});
+            .catch((err) => {Alert.alert("Network Error", "The network connection is lost.")});
         })
+    }else if(this.state.tempReading < 35){
+        Alert.alert("Warning", "You may be experiencing hypothermia.\n\nGet some help!");
     }else {
-        Alert.alert("LetMeIn", "Please recheck the temperature you have entered");
+        Alert.alert("Invalid temperature", "Please make sure temperature is a proper number!");
     }
   }
 

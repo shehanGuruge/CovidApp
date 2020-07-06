@@ -43,7 +43,7 @@ export default class SplashScreen extends Component {
                     style = {styles.logoImageStyle} />
             <Text style = {styles.captionStyle}> LetMeIn </Text>
           </View>
-          <Text style = {styles.versionInfo}> v 1.0.1 </Text>
+          <Text style = {styles.versionInfo}> v 1.0.0 </Text>
       </View>
     );
   }
