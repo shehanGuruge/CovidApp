@@ -16,12 +16,14 @@ const popupStyles = StyleSheet.create({
         marginHorizontal: 25, 
         borderRadius: 15,
         paddingHorizontal: 25, 
-        paddingVertical: 60
+        paddingBottom: 60,
+        paddingTop: 20
     },
     textStyles: {
         fontSize: 16, 
         color: "#a6a6a6", 
-        letterSpacing: 0.7
+        letterSpacing: 0.7,
+        marginTop: 10
     },
     textInputView:{
         width: "100%",
@@ -42,6 +44,12 @@ const popupStyles = StyleSheet.create({
         height: 2, 
         backgroundColor: '#a6a6a6',
          marginTop: 10
+    },
+    closeButtonStyles: {
+        width: 25, 
+        height: 25, 
+        resizeMode: 'contain', 
+        alignSelf: 'flex-end'
     }
 });
 

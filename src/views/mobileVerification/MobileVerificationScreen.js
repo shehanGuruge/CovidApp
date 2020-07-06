@@ -99,7 +99,6 @@ export default class MobileVerificationScreen extends Component {
     .catch(err => {
       console.log(err);
     })
-
   }
 
   handleVerification =  () => {

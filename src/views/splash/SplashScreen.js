@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
-import { View, Text, Image , AsyncStorage} from 'react-native';
+import { View, Text, Image , AsyncStorage, Alert} from 'react-native';
 import {ScreenDimensions} from '../.././utils/index'
 import {NavigationActions, StackActions} from 'react-navigation';
 import {styles} from './styles'
+import {BASE_URL,user_endpoints} from '../../constants/Endpoints';
+import {fetchFromAPI} from '../../helpers/requests';
+import {statusCode,HTTPMethods} from '../../constants/HTTPMethods'
 
 export default class SplashScreen extends Component {
 
@@ -10,6 +13,7 @@ export default class SplashScreen extends Component {
         try{
             this.checkUserLoggedIn()
             .then((isLogged) => {
+              console.log("ISLOGGEDE: " ,isLogged)
                 if(isLogged){
                     setTimeout(() => {
                         this.props.navigation.dispatch(this.toTabScreen)
@@ -63,7 +67,16 @@ export default class SplashScreen extends Component {
       AsyncStorage.getItem("_isLogged")
       .then(response => {
         if(response === "true"){
-          resolve(true)
+          AsyncStorage.getItem("_phn_number")
+          .then((response) => {
+            if(response !== null && response !== undefined && response !== ""){
+              this.checkUserExists(response)
+              .then(isExist => {
+                console.log(isExist)
+                resolve(isExist)
+              })
+            }
+          })
         }else {
           resolve(false)
         }
@@ -73,9 +86,25 @@ export default class SplashScreen extends Component {
         resolve(false)
       })
     })
-    
   }
 
 
-  
+  checkUserExists = (phnNumber) => {
+
+    var url = BASE_URL + user_endpoints.DOES_USER_EXIST+parseInt(phnNumber);
+
+    return new Promise((resolve, reject) => {
+      fetchFromAPI({URL: url, request_method: HTTPMethods.GET})
+      .then((response) => {
+        console.log(response)
+          statusCode.SUCCESSFUL.includes(response.code)
+          ? resolve(true) : resolve(false)
+      })
+      .catch(err => {
+        Alert.alert("LetMeIn" , "An unexpected error occured. Please try again later");
+        reject(err)
+      })
+    })
+  }
+ 
 }

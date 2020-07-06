@@ -2,11 +2,13 @@ import React, { Component } from 'react';
 import { View, Text , Image, TextInput, AsyncStorage, Alert} from 'react-native';
 import * as Permissions from 'expo-permissions'
 import {BarCodeScanner} from 'expo-barcode-scanner'
+import {NavigationEvents} from 'react-navigation'
 import {popupStyles} from './styles'
 import {BASE_URL,checkin_endpoints, shop_endpoints} from '../../../constants/Endpoints';
 import {fetchFromAPI} from '../../../helpers/requests';
 import {HTTPMethods, statusCode} from '../../../constants/HTTPMethods'
 import {Loader} from '../../../components/index';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 var celciusDegreeSymbol = '°'
 export default class ScanQRScreen extends Component {
@@ -37,6 +39,20 @@ export default class ScanQRScreen extends Component {
     return (
         <View style = {{flex: 1, backgroundColor: '#fff'}}>
             <Loader isVisible = {this.state.isFetching}/>
+            <NavigationEvents 
+                onWillBlur = {
+                    payload => {
+                        this.setState({
+                            isScanned: false,
+                            showTemperaturePopup: false,
+                            barcodeData : null,
+                            tempReading: null,
+                            isFetching: false,
+                            hideBarcodeReader: false
+                        })
+                    }
+                }
+            />
       
         {this.state.hasCameraPermissions === true &&
             <View style = {{flex: 1, flexDirection: 'column', alignItems: 'center', backgroundColor: '#fff'}}>
@@ -84,6 +100,12 @@ export default class ScanQRScreen extends Component {
         return(
             <View style = {popupStyles.outerView}>
                 <View style = {popupStyles.popupView}>
+                    <TouchableOpacity onPress = {
+                        () => {this.setState({ showTemperaturePopup: false, hideBarcodeReader: false, tempReading: null})
+                    }}>
+                        <Image source = {require('../../../../assets/tabbedScreenImages/qrcodescreen/close.png')}
+                        style = {popupStyles.closeButtonStyles}/>
+                    </TouchableOpacity>
                     <Text style = {popupStyles.textStyles}>Enter your body temperature</Text>
                     <View style = {popupStyles.textInputView}>
                         <TextInput style = {[popupStyles.textInputStyles,{textAlign:'center'}]}
@@ -120,12 +142,7 @@ export default class ScanQRScreen extends Component {
                 [
                     {
                         text: "OK",
-                        onPress: () => {
-                            this.setState({
-                                isFetching: false,
-                                hideBarcodeReader: false,
-                            })
-                        }
+                        onPress: () => this.handleOKButtonClicked()
                     }
                 ]);
             }
@@ -157,17 +174,47 @@ export default class ScanQRScreen extends Component {
                 console.log(response)
                 this.setState({ isFetching: false, hideBarcodeReader: false});
                 if(statusCode.SUCCESSFUL.includes(response.code)){
-                    Alert.alert("Check In Successful!", "Please enter to the shop now!");
+                    Alert.alert("Check In Successful!", "Please enter to the shop now!",
+                    [
+                        {
+                            text: "OK",
+                            onPress: () => this.handleOKButtonClicked()
+                        }
+                    ]);
                 }else{
-                    Alert.alert("Check In Failed!", "Unable to check in. Please try again");
+                    Alert.alert("Check In Failed!", "Unable to check in. Please try again",
+                    [
+                        {
+                            text: "OK",
+                            onPress: () => this.handleOKButtonClicked()
+                        }
+                    ]);
                 }
             })
-            .catch((err) => {Alert.alert("Network Error", "The network connection is lost.")});
+            .catch((err) => {Alert.alert("Network Error", "The network connection is lost.",
+            [
+                {
+                    text: "OK",
+                    onPress: () => this.handleOKButtonClicked()
+                }
+            ])});
         })
     }else if(this.state.tempReading < 35){
-        Alert.alert("Warning", "You may be experiencing hypothermia.\n\nGet some help!");
+        Alert.alert("Warning", "You may be experiencing hypothermia.\n\nGet some help!",
+        [
+            {
+                text: "OK",
+                onPress: () => this.handleOKButtonClicked()
+            }
+        ]);
     }else {
-        Alert.alert("Invalid temperature", "Please make sure temperature is a proper number!");
+        Alert.alert("Invalid temperature", "Please make sure temperature is a proper number!",
+        [
+            {
+                text: "OK",
+                onPress: () => this.handleOKButtonClicked()
+            }
+        ]);
     }
   }
 
@@ -186,5 +233,13 @@ export default class ScanQRScreen extends Component {
         })
     })
     
+  }
+
+  handleOKButtonClicked = () => {
+    this.setState({
+        isFetching: false,
+        hideBarcodeReader: false,
+        tempReading: null,
+    })
   }
 }
