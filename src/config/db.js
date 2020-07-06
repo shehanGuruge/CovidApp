@@ -4,15 +4,15 @@ function initFirebase(){
     return new Promise((resolve, reject) => {
         try{
             var firebaseConfig = {
-                apiKey: "AIzaSyDnbht89E0t5X20ANR0vV_sRw_SXJhjprA",
-                authDomain: "covid-app-d6654.firebaseapp.com",
-                databaseURL: "https://covid-app-d6654.firebaseio.com",
-                projectId: "covid-app-d6654",
-                storageBucket: "covid-app-d6654.appspot.com",
-                messagingSenderId: "641884851862",
-                appId: "1:641884851862:web:49acd6c54925c745293cb7",
-                measurementId: "G-91CW9LDQMG"
-              };
+                apiKey: "AIzaSyDAYYjIaMsYfD71xsUhnJxweF_NJT_gFJ0",
+                authDomain: "letmein-a7d65.firebaseapp.com",
+                databaseURL: "https://letmein-a7d65.firebaseio.com",
+                projectId: "letmein-a7d65",
+                storageBucket: "letmein-a7d65.appspot.com",
+                messagingSenderId: "827326013761",
+                appId: "1:827326013761:web:20e964935a0fe9fb7741c0",
+                measurementId: "G-XM7R2HBYR5"
+            };
 
               if(!firebase.apps.length){
                   firebase.initializeApp(firebaseConfig);
