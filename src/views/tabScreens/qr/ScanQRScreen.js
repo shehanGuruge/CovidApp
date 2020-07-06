@@ -101,26 +101,34 @@ export default class ScanQRScreen extends Component {
   }
 
   handleBarCodeScanned = ({ data}) => {
+      console.log(data)
       if(data !== null){
         this.setState({
             isFetching: true,
             barcodeData: data,
             hideBarcodeReader: true
         })
-        this.checkShopAvailabilityById()
+        this.checkShopAvailabilityById(data)
         .then((response) => {
             if(response === true){
                 this.setState({
                     isFetching: false,
-                    hideBarcodeReader: false,
                     showTemperaturePopup: true
                 })
             }else{
-                Alert.alert("LetMeIn", "Invalid Registration id. Please scan a valid QR Code");
-                this.setState({
-                    isFetching: false,
-                    hideBarcodeReader: false,
-                })
+                Alert.alert("LetMeIn", "Invalid Registration id. Please scan a valid QR Code",
+                [
+                    {
+                        text: "OK",
+                        onPress: () => {
+                            this.setState({
+                                isFetching: false,
+                                hideBarcodeReader: false,
+                            })
+                        }
+                    }
+                ]);
+                
             }
         })
       }
@@ -137,16 +145,18 @@ export default class ScanQRScreen extends Component {
         .then((phnNumber) => {
             var url = BASE_URL + checkin_endpoints.CHECK_IN;
             var _body = {
-                "phoneNumber" : phnNumber, 
+                "phoneNumber" : parseInt(phnNumber), 
                 "shop_reg_id" : this.state.barcodeData, 
                 "temp": this.state.tempReading, 
                 "check_in_at" : new Date().toISOString(),
             }
-    
+            console.log(_body)
+            console.log(url)
             this.setState({isFetching: true})
             fetchFromAPI({URL:url, request_method: HTTPMethods.POST,body: JSON.stringify(_body)})
             .then((response) => {
-                this.setState({ isFetching: false});
+                console.log(response)
+                this.setState({ isFetching: false, hideBarcodeReader: false});
                 if(statusCode.SUCCESSFUL.includes(response.code)){
                     Alert.alert("LetMeIn", "QR Code scanned successfully");
                 }else{
@@ -161,8 +171,8 @@ export default class ScanQRScreen extends Component {
   }
 
 
-  checkShopAvailabilityById = () => {
-    var url = BASE_URL + shop_endpoints.DOES_SHOP_EXISTS + "\"" + this.state.barcodeData + "\"";
+  checkShopAvailabilityById = (data) => {
+    var url = BASE_URL + shop_endpoints.DOES_SHOP_EXISTS + "\"" + data + "\"";
     return new Promise((resolve, reject) => {
         fetchFromAPI({URL:url, request_method: HTTPMethods.GET})
         .then((response) => {
