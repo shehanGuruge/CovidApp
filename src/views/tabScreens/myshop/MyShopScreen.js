@@ -162,6 +162,7 @@ export default class MyShopScreen extends Component {
                                     doRenderShopScreen: true,
                                 })
                             }}
+                            isEditable = {false}
                             shopName = {item.name}
                             addressLine1 = {item.address1 !== null ? item.address1.toUpperCase() : "-"}
                             addressLine2 = {item.address2 !== null ? item.address2.toUpperCase() : "-"}/> 
@@ -322,7 +323,6 @@ export default class MyShopScreen extends Component {
 
   renderShopCheckinScreen = () => {
       if(this.state.whoCheckedIn !== null){
-          console.log(base64_qr)
             return(
                 <View style = {shopScreenStyles.container}>
                     <BackButton onPress = {() => this.handleOnBackClicked(SCREENS.FROM_SHOP_CHECKING)}/>
@@ -498,9 +498,15 @@ export default class MyShopScreen extends Component {
             })
             break;
         case SCREENS.FROM_SHOP_CHECKING:
+            base64_qr = null
+            var _clickedItem = this.state.clickedItem
             this.setState({
                 whoCheckedIn: null,
                 doRenderShopScreen: true,
+                clickedItem: null,
+            })
+            this.setState({
+                clickedItem: _clickedItem,
             })
             break;
         case SCREENS.FROM_SHOP_DETAILS:

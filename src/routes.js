@@ -4,7 +4,7 @@ import {createStackNavigator} from 'react-navigation-stack'
 import {createBottomTabNavigator} from 'react-navigation-tabs'
 import {createAppContainer} from 'react-navigation'
 import {MobileVerificationScreen,RegistrationScreen,OtpScreen, ScanQRScreen, HomeScreen,MyShopScreen,
-    ProfileScreen, WelcomeScreen, SplashScreen} from './views/index'
+    ProfileScreen, WelcomeScreen, SplashScreen, EditShopScreen} from './views/index'
 import {LogOut} from './components/index';
 
 const MainStackNavigator = createStackNavigator({
@@ -69,12 +69,23 @@ const MainStackNavigator = createStackNavigator({
                     )
                 }
             },
+            EditShop: {
+                screen: EditShopScreen,
+                navigationOptions:{
+                    tabBarLabel: 'Edit',
+                    tabBarIcon: ({tintColor}) => (
+                        <Image source = {require('../assets/tabbarIcons/edit.png')} 
+                        style = {{resizeMode: 'contain',height: 21,width: 21, tintColor : tintColor}}/>
+                    )
+                }
+            },
             Profile : {
                 screen: ProfileScreen,
                 navigationOptions:{
                     tabBarLabel: 'Profile',
                     tabBarIcon: ({tintColor}) => (
-                        <Image source = {require('../assets/tabbarIcons/profile.png')} style = {{resizeMode: 'contain',height: 21,width: 21, tintColor : tintColor}}/>
+                        <Image source = {require('../assets/tabbarIcons/profile.png')} 
+                        style = {{resizeMode: 'contain',height: 21,width: 21, tintColor : tintColor}}/>
                     ),
                 }
             }

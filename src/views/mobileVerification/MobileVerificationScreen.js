@@ -31,7 +31,7 @@ export default class MobileVerificationScreen extends Component {
     super(props);
     // 713769217
     this.state = {
-        contactNumber: "719302755",
+        contactNumber: "",
         phoneCode: "+94",
         isErrorMessageVisible: false,
         isVisible: false,
