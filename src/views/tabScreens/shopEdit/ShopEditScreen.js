@@ -31,6 +31,15 @@ export default class ShopEditScreen extends Component {
                         this.checkAvailability()
                     }
                 }
+                onWillBlur = {
+                    payload => {
+                        this.setState({
+                            doesExist: true,
+                            isShopListingScreenVisible: true,
+                            clickedItem: null
+                        })
+                    }
+                }
             />
             {this.renderNoExistingShopsScreen()}
             {this.renderShopEditScreen()}
@@ -41,7 +50,7 @@ export default class ShopEditScreen extends Component {
 
 
   renderShopListingScreen = () => {
-      if(this.state.doesExist === true || this.state.isShopListingScreenVisible === true){
+      if((this.state.doesExist === true || this.state.isShopListingScreenVisible === true) && this.state.data !== null){
           return(
             <View style = {shopListingStyles.container}>
                 <Text style = {shopListingStyles.headerTextStyles}>My shops</Text>
@@ -305,7 +314,12 @@ handleOnSaveClicked = () => {
             })
             console.log(response)
             statusCode.SUCCESSFUL.includes(response.code) ? 
-            Alert.alert("LetMeIn", "Shop Details successfully updated")
+            Alert.alert("LetMeIn", "Shop Details successfully updated",[
+                {
+                    text: "OK",
+                    onPress: () => this.handleOnBackClicked()
+                }
+            ])
             : Alert.alert("LetMeIn", "Network Issue. Please try again later");
         })
         .catch(err => {
