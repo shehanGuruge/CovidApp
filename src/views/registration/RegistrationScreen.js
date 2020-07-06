@@ -145,13 +145,13 @@ export default class RegistrationScreen extends Component {
                 }).catch(err => {this.setState({isVisible:false})})
 
               }else{
-                Alert.alert("LetMeIn", "User already exists with the same contact number.Please login to the application");
+                Alert.alert("User Exists", "User already exists with the same contact number.Please login to the application");
               }
           })
           
 
       }else{
-        Alert.alert("LetMeIn" , "Contact Number is a mandatory field.");
+        Alert.alert("Contact Number missing!" , "Contact Number is a mandatory field.");
       }
   }
 

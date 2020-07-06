@@ -13,6 +13,7 @@ import {ScreenDimensions} from '../../../utils/index'
 import {tempToColor} from '../../../helpers/converters/tempToColorConverter'
 import * as MediaLibrary from 'expo-media-library';
 import * as FileSystem from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
 import * as Permissions from 'expo-permissions';
 import * as Print from 'expo-print'
 
@@ -241,7 +242,7 @@ export default class MyShopScreen extends Component {
                                         onChangeText = {value => this.setState({country: value})}>
                             </TextInput>
 
-                            <Text style = {styles.textFieldText}>State</Text>
+                            <Text style = {styles.textFieldText}>Nature of Business</Text>
                             <Picker selectedValue={this.state.natureOfBusiness}  
                                     onValueChange={(itemValue, itemPosition) =>  
                                         this.setState({natureOfBusiness: itemValue})}  
@@ -301,6 +302,10 @@ export default class MyShopScreen extends Component {
                     </View>
                     <TouchableOpacity onPress = {() =>  this.downloadFile()}>
                         <Text style = {shopScreenStyles.btnSaveQRcodeStyles}>Save QR Code</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity onPress = {() =>  this.share()}>
+                        <Text style = {shopScreenStyles.btnSaveQRcodeStyles}>Share QR Code</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity>
@@ -389,9 +394,9 @@ export default class MyShopScreen extends Component {
                         console.log(response)
                         this.setState({isVisible: false})
                         if(statusCode.UNSUCCESSFUL.includes(response.code)){
-                            Alert.alert("LetMeIn", "Please try again later");
+                            Alert.alert("Warning", "Please try again later");
                         }else{
-                            Alert.alert("LetMeIn", "Shop Created Successfully",
+                            Alert.alert("Success", "Shop Created Successfully",
                             [
                                 {
                                     text: "OK",
@@ -404,16 +409,16 @@ export default class MyShopScreen extends Component {
                     .catch((err) => {
                         this.setState({isVisible: false})
                         console.log(err)
-                        Alert.alert("LetMeIn", "Please try again later");
+                        Alert.alert("Warning", "Please try again later");
                     })
                 }else{
                     this.setState({isVisible:false})
-                    Alert.alert("LetMeIn", "A shop with the same registration Id exists. Please try with a different registration id");
+                    Alert.alert("Registration Id Exists!", "A shop with the same registration Id exists. \n\n Please try with a different registration id");
                 }
             })
 
         }else{
-            Alert.alert("LetMeIn", "Please recheck the mobile number and the registration number");
+            Alert.alert("Invalid Data!", "Please recheck the mobile number and the registration number");
         }
 
   }
@@ -427,7 +432,7 @@ export default class MyShopScreen extends Component {
             statusCode.UNSUCCESSFUL.includes(response.code) ? resolve(false) : resolve(true)
         })
         .catch((err) => {
-            Alert.alert("LetMeIn", "Please try again later");
+            Alert.alert("Warning", "Please try again later");
             console.log(err);
             reject(err);
         })
@@ -501,29 +506,133 @@ export default class MyShopScreen extends Component {
     }
   }
 
+  async downloadFile(){
+      try {
+          let filePath = await Print.printToFileAsync({
+              html:' <div style = "margin-top: 40%; margin-left: 30%;"><h2 style = "margin-left: 50px; font-size: 45px;">LetMeIn</h2>'
+                  +'<img src="' + base64_qr +'"'
+                  + 'alt="Red dot" style = "margin-left: 20px; margin-top: 10px;" />'
+                  + '<h2 style = "margin-top: 50px;">Scan the QR Code to check in</h2>'
+                  + '</div>',
+              width : 612,
+              height : 792,
+          });
 
-  downloadFile(){
+          const pdfName = `${filePath.uri.slice(
+              0,
+              filePath.uri.lastIndexOf('/') + 1
+          )}QRCode.pdf`
 
-    Print.printAsync({
-       html:' <div style = "margin-top: 40%; margin-left: 30%;"><h2 style = "margin-left: 50px; font-size: 45px;">LetMeIn</h2>'
-        +'<img src="' + base64_qr +'"'
-        + 'alt="Red dot" style = "margin-left: 20px; margin-top: 10px;" />'
-        + '<h2 style = "margin-top: 50px;">Scan the QR Code to check in</h2>'
-        + '</div>',
-        width : 612,
-        height : 792,
-  
-      }).then((response) => {
-        console.log(response)
-      })
-}
+          await FileSystem.moveAsync({
+              from: filePath.uri,
+              to: pdfName,
+          })
 
-saveFile = async (fileUri) => {
-    const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
-    if (status === "granted") {
-        const asset = await MediaLibrary.createAssetAsync(fileUri)
-        await MediaLibrary.createAlbumAsync("Download", asset, false)
+          console.log('PDF Generated', pdfName);
+          this.saveFile(pdfName);
+
+      } catch (error) {
+          console.error(error);
+      }
+
+  }
+
+  async share(){
+
+      try {
+          let filePath = await Print.printToFileAsync({
+              html:' <div style = "margin-top: 40%; margin-left: 30%;"><h2 style = "margin-left: 50px; font-size: 45px;">LetMeIn</h2>'
+                  +'<img src="' + base64_qr +'"'
+                  + 'alt="Red dot" style = "margin-left: 20px; margin-top: 10px;" />'
+                  + '<h2 style = "margin-top: 50px;">Scan the QR Code to check in</h2>'
+                  + '</div>',
+              width : 612,
+              height : 792,
+          });
+
+          const pdfName = `${filePath.uri.slice(
+              0,
+              filePath.uri.lastIndexOf('/') + 1
+          )}QRCode.pdf`
+
+          await FileSystem.moveAsync({
+              from: filePath.uri,
+              to: pdfName,
+          })
+
+          console.log('PDF Generated', pdfName);
+          await Sharing.shareAsync(pdfName);
+
+      } catch (error) {
+          console.error(error);
+      }
+  }
+
+    saveFile = async (fileUri) => {
+        const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+        if (status === "granted") {
+            const asset = await MediaLibrary.createAssetAsync(fileUri)
+            await MediaLibrary.createAlbumAsync("LetMeIn", asset, false)
+        }
     }
-}
+
+
+    //Keep this comment code!!!
+
+    // async pdfFile(){
+    //
+    //   try {
+    //       let filePath = await Print.printToFileAsync({
+    //           html:' <div style = "margin-top: 40%; margin-left: 30%;"><h2 style = "margin-left: 50px; font-size: 45px;">LetMeIn</h2>'
+    //               +'<img src="' + base64_qr +'"'
+    //               + 'alt="Red dot" style = "margin-left: 20px; margin-top: 10px;" />'
+    //               + '<h2 style = "margin-top: 50px;">Scan the QR Code to check in</h2>'
+    //               + '</div>',
+    //           width : 612,
+    //           height : 792,
+    //       });
+    //
+    //       const pdfName = `${filePath.uri.slice(
+    //           0,
+    //           filePath.uri.lastIndexOf('/') + 1
+    //       )}QRCode.pdf`
+    //
+    //       await FileSystem.moveAsync({
+    //           from: filePath.uri,
+    //           to: pdfName,
+    //       })
+    //
+    //      console.log('PDF Generated', pdfName);
+    //
+    //       //return filePath;
+    //
+    //       // if (Platform.OS === "ios") {
+    //       //     await Sharing.shareAsync(pdfName);
+    //       // } else {
+    //       //     await Sharing.shareAsync(pdfName);
+    //       //     this.saveFile(pdfName);
+    //       //     // const permission = await MediaLibrary.requestPermissionsAsync();
+    //       //     // if (permission.granted) {
+    //       //     //     await MediaLibrary.createAssetAsync(uri);
+    //       //     // }
+    //       // }
+    //   } catch (error) {
+    //       console.error(error);
+    //   }
+
+    // Print.printAsync({
+    //    html:' <div style = "margin-top: 40%; margin-left: 30%;"><h2 style = "margin-left: 50px; font-size: 45px;">LetMeIn</h2>'
+    //     +'<img src="' + base64_qr +'"'
+    //     + 'alt="Red dot" style = "margin-left: 20px; margin-top: 10px;" />'
+    //     + '<h2 style = "margin-top: 50px;">Scan the QR Code to check in</h2>'
+    //     + '</div>',
+    //     width : 612,
+    //     height : 792,
+    //
+    //   }).then((response) => {
+    //     console.log(response)
+    //   })
+// }
+
 
 }

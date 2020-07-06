@@ -226,7 +226,7 @@ export default class ProfileScreen extends Component {
           })
           console.log(this.state.data)
       }else{
-        Alert.alert("LetMeIn", "Network issue.Please try again later");
+        Alert.alert("Network Error", "The network connection is lost.");
       }
 
     })
@@ -248,16 +248,16 @@ export default class ProfileScreen extends Component {
         this.setState({isFetching: false})
 
         if(statusCode.SUCCESSFUL.includes(response.code)) {
-          Alert.alert("LetMeIn" , "Profile updated successfully")
+          Alert.alert("Success" , "Profile updated successfully")
           this.setState({doEdit: true, isEditable: false})
           this.bindData();
         }else{
-          Alert.alert("LetMeIn" , "Please recheck the mobile number and try again");
+          Alert.alert("Error" , "Please recheck the mobile number and try again");
         }
 
     })
     .catch(err => {
-      Alert.alert("LetMeIn" , "Network Issue. Please try again later");
+      Alert.alert("Network Error" , "The network connection is lost.");
     })
     // DialogBox.op
   }
