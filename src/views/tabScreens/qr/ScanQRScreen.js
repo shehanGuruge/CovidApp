@@ -9,6 +9,9 @@ import {fetchFromAPI} from '../../../helpers/requests';
 import {HTTPMethods, statusCode} from '../../../constants/HTTPMethods'
 import {Loader} from '../../../components/index';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import * as Localization from 'expo-localization'
+import {getTimezone} from 'countries-and-timezones'
+import moment from 'moment';
 
 var celciusDegreeSymbol = '°'
 export default class ScanQRScreen extends Component {
@@ -160,11 +163,13 @@ export default class ScanQRScreen extends Component {
         AsyncStorage.getItem("_phn_number")
         .then((phnNumber) => {
             var url = BASE_URL + checkin_endpoints.CHECK_IN;
+            var date = moment().utcOffset(getTimezone(Localization.timezone).utcOffsetStr).toISOString(true)
+            var omitOffset = date.split("+")
             var _body = {
                 "phoneNumber" : parseInt(phnNumber), 
                 "shop_reg_id" : this.state.barcodeData, 
                 "temp": this.state.tempReading, 
-                "check_in_at" : new Date().toISOString(),
+                "check_in_at" : omitOffset[0],
             }
             console.log(_body)
             console.log(url)

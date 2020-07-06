@@ -13,7 +13,6 @@ export default class SplashScreen extends Component {
         try{
             this.checkUserLoggedIn()
             .then((isLogged) => {
-              console.log("ISLOGGEDE: " ,isLogged)
                 if(isLogged){
                     setTimeout(() => {
                         this.props.navigation.dispatch(this.toTabScreen)
@@ -72,7 +71,6 @@ export default class SplashScreen extends Component {
             if(response !== null && response !== undefined && response !== ""){
               this.checkUserExists(response)
               .then(isExist => {
-                console.log(isExist)
                 resolve(isExist)
               })
             }
@@ -96,7 +94,6 @@ export default class SplashScreen extends Component {
     return new Promise((resolve, reject) => {
       fetchFromAPI({URL: url, request_method: HTTPMethods.GET})
       .then((response) => {
-        console.log(response)
           statusCode.SUCCESSFUL.includes(response.code)
           ? resolve(true) : resolve(false)
       })

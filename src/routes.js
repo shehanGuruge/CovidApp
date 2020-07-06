@@ -5,6 +5,7 @@ import {createBottomTabNavigator} from 'react-navigation-tabs'
 import {createAppContainer} from 'react-navigation'
 import {MobileVerificationScreen,RegistrationScreen,OtpScreen, ScanQRScreen, HomeScreen,MyShopScreen,
     ProfileScreen, WelcomeScreen, SplashScreen} from './views/index'
+import {LogOut} from './components/index';
 
 const MainStackNavigator = createStackNavigator({
     Splash: {
@@ -96,6 +97,7 @@ const MainStackNavigator = createStackNavigator({
             headerStyle: {
                 backgroundColor: '#2b84a4'
             },
+            headerRight:() =>  <LogOut/>,
         }
     }
 },

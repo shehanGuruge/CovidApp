@@ -16,9 +16,11 @@ import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import * as Permissions from 'expo-permissions';
 import * as Print from 'expo-print'
+import countryTelephoneCode from "country-telephone-code";
 
 
 var ownerContactNumber = null;
+var s = null;
 var daysOfTheWeek = ["Sun" , "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 var base64_qr = null;
@@ -296,12 +298,12 @@ export default class MyShopScreen extends Component {
                         <Text style = {shopScreenStyles.shopDescriptionStyles}>{this.state.clickedItem.mobile_no}</Text>
                     </View>
                     <View style = {{alignSelf: 'center', marginTop: 30}}>
-                        <QRCode value = {this.state.clickedItem.reg_id} 
+                        <QRCode value = {this.state.clickedItem.reg_id} ref = {ref => s = ref}
                                 getImageOnLoad = {(value) => {base64_qr = value}}
                                 size = {250} bgColor = "black" fgColor = "white"  />
                     </View>
                     <TouchableOpacity onPress = {() =>  this.downloadFile()}>
-                        <Text style = {shopScreenStyles.btnSaveQRcodeStyles}>Save QR Code</Text>
+                        <Text style = {shopScreenStyles.btnSaveQRcodeStyles}>Download QR Code</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity onPress = {() =>  this.share()}>
@@ -334,6 +336,9 @@ export default class MyShopScreen extends Component {
                                 customerName = {item.cus_name}
                                 backColor = {tempToColor(parseInt(item.temp))} 
                                 temperature = {item.temp}
+                                mobileNumber = {item.country !== null && item.country !== "" ? 
+                                                "+" + countryTelephoneCode(item.country) + "-" + item.mobile_no
+                                                : item.mobile_no} 
                                 checkedInDateTime = {this.dateTimeConverter(item.check_in_at)}
                             />
                         }
@@ -355,6 +360,7 @@ export default class MyShopScreen extends Component {
     .then((response) => {
         this.setState({isVisible: false})
         if(statusCode.SUCCESSFUL.includes(response.code) && response.data.totalShopCheckIn > 0){
+            console.log("CHECKED IN: " , response.data.shopCheckIn)
             this.setState({
                 whoCheckedIn: response.data.shopCheckIn,
                 doRenderShopScreen: false,
@@ -561,7 +567,14 @@ export default class MyShopScreen extends Component {
           })
 
           console.log('PDF Generated', pdfName);
-          await Sharing.shareAsync(pdfName);
+          Sharing.shareAsync(pdfName)
+          .then(() => {
+              base64_qr = null;
+              this.setState({
+                  doesExist: true,
+                  doRenderShopScreen : false
+              })
+          })
 
       } catch (error) {
           console.error(error);
@@ -572,7 +585,15 @@ export default class MyShopScreen extends Component {
         const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
         if (status === "granted") {
             const asset = await MediaLibrary.createAssetAsync(fileUri)
-            await MediaLibrary.createAlbumAsync("LetMeIn", asset, false)
+            MediaLibrary.createAlbumAsync("LetMeIn", asset, false)
+            .then((response) => {
+                if(response !== null && response.assetCount === 1){
+                    Alert.alert("LetMeIn", "Your QR Code is successfully downloaded to your device folder: LetMeIn")
+                }
+            })
+            .catch(err => {
+                Alert.alert("LetMeIn", "QR Code downloading failed. Please try again")
+            })
         }
     }
 

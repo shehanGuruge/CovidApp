@@ -8,6 +8,7 @@ import {HTTPMethods,statusCode} from '../../../constants/HTTPMethods'
 import {Loader} from '../../../components/index';
 import {tempToColor} from '../../../helpers/converters/tempToColorConverter';
 import {filterByDate} from '../../../helpers/filters/dateFilter'
+import {NavigationEvents} from 'react-navigation'
 
 var phoneNumber = null;
 var daysOfTheWeek = ["Sun" , "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -53,6 +54,13 @@ export default class HomeScreen extends Component {
     return (
       <View style = {styles.outerContainer}>
           <Loader  isVisible = {this.state.isFetching}/>
+          <NavigationEvents 
+                onDidFocus = {
+                   payload => {
+                        this.loadCheckins();
+                   } 
+                }
+            />
         <Text style = {{color: '#666666', fontSize: 20, marginTop: 25}}> My Checkings </Text>
 
         <View style = {styles.tabsView}>
@@ -112,6 +120,14 @@ export default class HomeScreen extends Component {
   }
 
 
+  noRecordsFound = () => {
+      if(!this.state.isFetching && this.state.data !== null){
+          return(
+              <Text></Text>
+          )
+      }
+  }
+
   loadCheckins = () => {
     AsyncStorage.getItem("_phn_number")
     .then((phnNumber) => {
@@ -139,15 +155,12 @@ export default class HomeScreen extends Component {
 
     if(isoDateTime !== null){
         var date = new Date(isoDateTime);
-
-
-        var dateInStringFormat = (date.getDate() < 10 ? "0" + date.getDate() : date.getDate()) + " " + 
-                                months[date.getMonth()] + " " + date.getFullYear();
+        var dateInStringFormat = (date.getUTCDate() < 10 ? "0" + date.getUTCDate() : date.getUTCDate()) + " " + 
+                                months[date.getUTCMonth()] + " " + date.getFullYear();
         var timeInStringFormat = (date.getUTCHours() < 10 ? "0"+date.getUTCHours() : date.getUTCHours()) + ":" + 
                                 (date.getUTCMinutes() < 10 ? "0"+date.getUTCMinutes() : date.getUTCMinutes()) + "h"
         
         var stringDateTime = daysOfTheWeek[date.getDay()] + ", " + dateInStringFormat +" at "+ timeInStringFormat;
-
         return stringDateTime;
     }
   }

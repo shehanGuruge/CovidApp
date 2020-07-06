@@ -115,7 +115,8 @@ export default class RegistrationScreen extends Component {
   handleRegistration = () => {
 
 
-      if(this.state.contactNumber !== null){
+      if(this.state.contactNumber !== null && this.state.name !== null && this.state.contactNumber !== "" && 
+        this.state.name !== ""){
 
           this.checkUserExistence().
           then((response) => {
@@ -151,7 +152,7 @@ export default class RegistrationScreen extends Component {
           
 
       }else{
-        Alert.alert("Contact Number missing!" , "Contact Number is a mandatory field.");
+        Alert.alert("LetMeIn" , "Contact Number and Name are mandatory fields.");
       }
   }
 
