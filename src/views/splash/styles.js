@@ -4,7 +4,7 @@ import {ScreenDimensions} from '../../utils/index'
 const styles = StyleSheet.create({
     outerView: {
         flex: 1, 
-        backgroundColor: "#ffffff",
+        backgroundColor: "#000000",
         flexDirection: 'column', 
         alignItems: 'center', 
         justifyContent:"space-between"
