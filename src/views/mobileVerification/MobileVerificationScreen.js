@@ -32,7 +32,7 @@ export default class MobileVerificationScreen extends Component {
     // 713769217
     this.state = {
         contactNumber: "",
-        phoneCode: "+94",
+        phoneCode: "+60",
         isErrorMessageVisible: false,
         isVisible: false,
         country: null,
@@ -56,7 +56,7 @@ export default class MobileVerificationScreen extends Component {
 
             <View style = {styles.contactNumberView}>
                 <PhoneInput ref={ref => { this.phone = ref; }}
-                          initialCountry = "lk"
+                          initialCountry = "my"
                           onSelectCountry = {country => this.setState({phoneCode: this.phone.getValue(), country: country})} 
                           flagStyle = {{height: 30, width: 30, borderRadius: 20}}/>
                 <Text style = {styles.contactCode}> {this.state.phoneCode} </Text>

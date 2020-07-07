@@ -39,10 +39,11 @@ export default class SplashScreen extends Component {
   }
 
   render() {
+      const myImageUrl = require('../../../assets/SplashScreen/app_logo.png')
     return (
       <View style = {styles.outerView}>
           <View style = {styles.imageAndTextView}>
-            <Image source = {require('../../../assets/SplashScreen/app_logo.png')}
+            <Image source = {myImageUrl}
                     style = {styles.logoImageStyle} />
             <Text style = {styles.captionStyle}> LetMeIn </Text>
           </View>

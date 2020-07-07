@@ -22,8 +22,8 @@ export default class RegistrationScreen extends Component {
       addressLine2: "",
       postalCode: "",
       isVisible: false,
-      countryCode: "+94",
-      country: "lk",
+      countryCode: "+60",
+      country: "my",
     };
   }
 
@@ -51,7 +51,7 @@ export default class RegistrationScreen extends Component {
           <Text style = {styles.textFieldText}>Mobile Number</Text>
           <View style = {styles.contactNumberView}>
               <PhoneInput ref={ref => { this.phone = ref; }}
-                initialCountry = "lk"
+                initialCountry = "my"
                 onSelectCountry = {country => this.setState({countryCode: this.phone.getValue(), country: country})}
                 flagStyle = {{height: 30, width: 30, borderRadius: 20}} />
               <Text style = {styles.contactCode}> {this.state.countryCode} </Text>
