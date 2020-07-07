@@ -59,7 +59,7 @@ export default class ProfileScreen extends Component {
                     >
           </TextInput>
         
-          <Text style = {styles.textFieldText}>NIC / Passport</Text>
+          <Text style = {styles.textFieldText}>NRIC / Passport</Text>
           <TextInput style = {[styles.textInputStyle, 
                         {color: this.state.isEditable ? "#000000" : "#bfbfbf",
                         borderBottomColor:  this.state.isEditable ? "#000000" : "#bfbfbf"

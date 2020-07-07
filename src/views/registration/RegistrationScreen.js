@@ -41,7 +41,7 @@ export default class RegistrationScreen extends Component {
                       onChangeText = {value => this.setState({name: value})}>
           </TextInput>
         
-          <Text style = {styles.textFieldText}>NIC / Passport</Text>
+          <Text style = {styles.textFieldText}>NRIC / Passport</Text>
           <TextInput style = {styles.textInputStyle}
                       value = {this.state.nic}
                       onChangeText = {value => this.setState({nic: value})}>
