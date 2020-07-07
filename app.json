@@ -15,7 +15,7 @@
     },
     "icon": "./assets/icon.png",
     "splash": {
-      "image": "./assets/aa.png",
+      "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#000000"
     },
