@@ -23,7 +23,7 @@
     "expo-permissions": "~8.1.0",
     "expo-print": "~8.1.0",
     "expo-sharing": "~8.1.0",
-    "firebase": "^7.15.5",
+    "firebase": "^9.18.0",
     "moment": "^2.29.4",
     "react": "~16.9.0",
     "react-dom": "~16.9.0",
