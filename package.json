@@ -14,7 +14,7 @@
     "base64topdf": "^1.1.8",
     "countries-and-timezones": "^2.2.0",
     "country-telephone-code": "^0.2.0",
-    "expo": "~52.0.7",
+    "expo": "~54.0.31",
     "expo-barcode-scanner": "~8.1.0",
     "expo-file-system": "~8.1.0",
     "expo-firebase-recaptcha": "^1.1.2",
